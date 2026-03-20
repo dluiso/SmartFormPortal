@@ -1,8 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAccessToken } from '@/lib/auth/jwt';
 import { getClientIp, isIpInList } from '@/lib/security/ipUtils';
 import { ACCESS_TOKEN_COOKIE } from '@/lib/auth/session';
 import { SystemRole } from '@prisma/client';
+
+// Edge Runtime-compatible JWT verification (jsonwebtoken requires Node.js crypto)
+async function verifyJWT(token: string, secret: string): Promise<{ userId: string; tenantId: string; email: string; systemRole: SystemRole; publicId: string }> {
+  const parts = token.split('.');
+  if (parts.length !== 3) throw new Error('Invalid token format');
+  const [headerB64, payloadB64, sigB64] = parts;
+
+  const pad = (s: string) => s + '='.repeat((4 - s.length % 4) % 4);
+  const fromB64Url = (s: string) => s.replace(/-/g, '+').replace(/_/g, '/');
+
+  const keyData = new TextEncoder().encode(secret);
+  const key = await crypto.subtle.importKey('raw', keyData, { name: 'HMAC', hash: 'SHA-256' }, false, ['verify']);
+
+  const sigBytes = Uint8Array.from(atob(pad(fromB64Url(sigB64))), (c) => c.charCodeAt(0));
+  const data = new TextEncoder().encode(`${headerB64}.${payloadB64}`);
+  const valid = await crypto.subtle.verify('HMAC', key, sigBytes, data);
+  if (!valid) throw new Error('Invalid signature');
+
+  const payload = JSON.parse(atob(pad(fromB64Url(payloadB64))));
+  if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) throw new Error('Token expired');
+  if (payload.iss !== 'smartformportal') throw new Error('Invalid issuer');
+
+  return payload;
+}
 
 // ─── Route Classification ─────────────────────────────────────────────────────
 
@@ -101,7 +124,8 @@ export async function middleware(request: NextRequest) {
     let isAdmin = false;
     if (token) {
       try {
-        const payload = verifyAccessToken(token);
+        const secret = process.env.JWT_SECRET ?? '';
+        const payload = await verifyJWT(token, secret);
         isAdmin = payload.systemRole === SystemRole.SUPER_ADMIN ||
                   payload.systemRole === SystemRole.ADMIN;
       } catch {
@@ -153,7 +177,8 @@ export async function middleware(request: NextRequest) {
   }
 
   try {
-    const payload = verifyAccessToken(token);
+    const secret = process.env.JWT_SECRET ?? '';
+    const payload = await verifyJWT(token, secret);
 
     // ── Step 9: Role-based route protection
     if (isAdminRoute(pathname)) {
