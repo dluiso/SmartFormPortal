@@ -1,0 +1,773 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────
+
+enum TenancyMode {
+  SINGLE
+  MULTI
+}
+
+enum UserType {
+  RESIDENT
+  BUSINESS_OWNER
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  PENDING_VERIFICATION
+}
+
+enum SystemRole {
+  SUPER_ADMIN
+  ADMIN
+  STAFF
+  CLIENT
+}
+
+enum ProcessStatus {
+  DRAFT
+  PENDING
+  IN_REVIEW
+  APPROVED
+  REJECTED
+  CANCELLED
+  EXPIRED
+}
+
+enum LogSeverity {
+  INFO
+  WARNING
+  ERROR
+  CRITICAL
+}
+
+enum BackupDestinationType {
+  LOCAL
+  SFTP
+  GOOGLE_DRIVE
+  ONEDRIVE
+  S3_COMPATIBLE
+}
+
+enum BackupStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+enum MessageStatus {
+  UNREAD
+  READ
+  ARCHIVED
+}
+
+enum LicenseType {
+  GOVERNMENTAL
+  EDUCATIONAL
+  HEALTH
+}
+
+enum NotificationType {
+  PROCESS_STATUS_CHANGED
+  PROCESS_NEAR_RENEWAL
+  NEW_MESSAGE
+  SYSTEM_ANNOUNCEMENT
+  LICENSE_EXPIRING
+  BACKUP_COMPLETED
+  BACKUP_FAILED
+  SYNC_ERROR
+}
+
+// ─────────────────────────────────────────────
+// SYSTEM CONFIGURATION (global, no tenant)
+// ─────────────────────────────────────────────
+
+model SystemConfig {
+  id           String      @id @default(uuid())
+  tenancyMode  TenancyMode @default(SINGLE)
+  isInstalled  Boolean     @default(false)
+  installedAt  DateTime?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@map("system_config")
+}
+
+// ─────────────────────────────────────────────
+// TENANT
+// ─────────────────────────────────────────────
+
+model Tenant {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  domain    String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users            User[]
+  roles            Role[]
+  departments      Department[]
+  processTemplates ProcessTemplate[]
+  dbConnections    DbConnection[]
+  categories       Category[]
+  settings         TenantSettings?
+  logs             ActivityLog[]
+  notifications    Notification[]
+  messages         Message[]
+  backupConfigs    BackupConfig[]
+  licenseInfo      TenantLicense?
+  syncJobs         SyncJob[]
+  ipRules          IpRule[]
+  allowedZipCodes  AllowedZipCode[]
+  blockedCountries BlockedCountry[]
+  languageFiles    LanguageFile[]
+
+  @@map("tenants")
+}
+
+// ─────────────────────────────────────────────
+// TENANT SETTINGS
+// ─────────────────────────────────────────────
+
+model TenantSettings {
+  id       String @id @default(uuid())
+  tenantId String @unique
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  portalName            String     @default("SmartFormPortal")
+  logoUrl               String?
+  faviconUrl            String?
+  loginBgColor          String?
+  loginBgImageUrl       String?
+  primaryColor          String     @default("#3b82f6")
+  secondaryColor        String     @default("#64748b")
+  accentColor           String     @default("#f59e0b")
+  customCss             String?    @db.Text
+  defaultLanguage       String     @default("en")
+  maintenanceMode       Boolean    @default(false)
+  maintenanceMessage    String?    @db.Text
+  attackMode            Boolean    @default(false)
+  allowRegistration     Boolean    @default(true)
+  enforceZipRestriction Boolean    @default(false)
+  emailConfig           String?    @db.Text
+  defaultUserRole       SystemRole @default(CLIENT)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("tenant_settings")
+}
+
+// ─────────────────────────────────────────────
+// TENANT LICENSE
+// ─────────────────────────────────────────────
+
+model TenantLicense {
+  id          String      @id @default(uuid())
+  tenantId    String      @unique
+  tenant      Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  licenseKey  String      @unique
+  licenseType LicenseType
+  isActive    Boolean     @default(false)
+  activatedAt DateTime?
+  expiresAt   DateTime?
+  domain      String?
+  rawLicense  String      @db.Text
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("tenant_licenses")
+}
+
+// ─────────────────────────────────────────────
+// ROLES & PERMISSIONS
+// ─────────────────────────────────────────────
+
+model Role {
+  id          String     @id @default(uuid())
+  tenantId    String
+  tenant      Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name        String
+  systemRole  SystemRole
+  description String?
+  isSystem    Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  permissions RolePermission[]
+  users       UserRole[]
+
+  @@unique([tenantId, systemRole])
+  @@map("roles")
+}
+
+model Permission {
+  id          String   @id @default(uuid())
+  module      String
+  action      String
+  description String?
+  createdAt   DateTime @default(now())
+
+  roles         RolePermission[]
+  userOverrides UserPermission[]
+
+  @@unique([module, action])
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  granted      Boolean    @default(true)
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model UserPermission {
+  userId       String
+  permissionId String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  granted      Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+
+  @@id([userId, permissionId])
+  @@map("user_permissions")
+}
+
+// ─────────────────────────────────────────────
+// USERS
+// ─────────────────────────────────────────────
+
+model User {
+  id           String     @id @default(uuid())
+  tenantId     String
+  tenant       Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  firstName    String
+  lastName     String
+  email        String
+  phone        String
+  organization String
+  userType     UserType   @default(RESIDENT)
+  addressLine  String
+  city         String
+  state        String
+  zipCode      String
+  country      String     @default("US")
+
+  passwordHash      String
+  publicId          String     @unique @default(uuid())
+  status            UserStatus @default(PENDING_VERIFICATION)
+  emailVerifiedAt   DateTime?
+  lastLoginAt       DateTime?
+  failedLoginCount  Int        @default(0)
+  lockedUntil       DateTime?
+  twoFactorSecret   String?
+  twoFactorEnabled  Boolean    @default(false)
+
+  preferredLanguage String  @default("en")
+  darkMode          Boolean @default(false)
+  primaryColor      String?
+  accentColor       String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  roles              UserRole[]
+  permissions        UserPermission[]
+  departments        UserDepartment[]
+  processInstances   ProcessInstance[]
+  favorites          ProcessFavorite[]
+  sentMessages       Message[]           @relation("MessageSender")
+  receivedMessages   MessageRecipient[]
+  notifications      Notification[]
+  activityLogs       ActivityLog[]
+  passwordResets     PasswordReset[]
+  emailVerifications EmailVerification[]
+  sessions           UserSession[]
+
+  @@unique([tenantId, email])
+  @@index([tenantId, status])
+  @@index([publicId])
+  @@map("users")
+}
+
+model UserRole {
+  userId     String
+  roleId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role       Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  assignedAt DateTime @default(now())
+  assignedBy String?
+
+  @@id([userId, roleId])
+  @@map("user_roles")
+}
+
+model UserSession {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  ipAddress String?
+  userAgent String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([token])
+  @@map("user_sessions")
+}
+
+model PasswordReset {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@map("password_resets")
+}
+
+model EmailVerification {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@map("email_verifications")
+}
+
+// ─────────────────────────────────────────────
+// DEPARTMENTS
+// ─────────────────────────────────────────────
+
+model Department {
+  id          String   @id @default(uuid())
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  staff            UserDepartment[]
+  processTemplates ProcessTemplate[]
+
+  @@unique([tenantId, name])
+  @@map("departments")
+}
+
+model UserDepartment {
+  userId       String
+  departmentId String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  assignedAt   DateTime   @default(now())
+  assignedBy   String?
+
+  @@id([userId, departmentId])
+  @@map("user_departments")
+}
+
+// ─────────────────────────────────────────────
+// CATEGORIES
+// ─────────────────────────────────────────────
+
+model Category {
+  id          String   @id @default(uuid())
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  color       String?
+  icon        String?
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  processTemplates ProcessTemplate[]
+
+  @@unique([tenantId, name])
+  @@map("categories")
+}
+
+// ─────────────────────────────────────────────
+// EXTERNAL DB CONNECTIONS (Laserfiche MSSQL)
+// ─────────────────────────────────────────────
+
+model DbConnection {
+  id                String   @id @default(uuid())
+  tenantId          String
+  tenant            Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name              String
+  description       String?
+  serverAddress     String
+  databaseName      String
+  username          String
+  passwordEncrypted String   @db.Text
+  tableName         String
+  port              Int      @default(1433)
+  isActive          Boolean  @default(true)
+  lastTestedAt      DateTime?
+  lastTestSuccess   Boolean?
+  lastTestError     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  processTemplates ProcessTemplate[]
+  syncJobs         SyncJob[]
+  fieldMappings    FieldMapping[]
+
+  @@unique([tenantId, name])
+  @@map("db_connections")
+}
+
+// ─────────────────────────────────────────────
+// PROCESS TEMPLATES
+// ─────────────────────────────────────────────
+
+model ProcessTemplate {
+  id             String        @id @default(uuid())
+  tenantId       String
+  tenant         Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  departmentId   String?
+  department     Department?   @relation(fields: [departmentId], references: [id])
+  categoryId     String?
+  category       Category?     @relation(fields: [categoryId], references: [id])
+  dbConnectionId String?
+  dbConnection   DbConnection? @relation(fields: [dbConnectionId], references: [id])
+
+  name            String
+  description     String?  @db.Text
+  publicUrl       String
+  isPublic        Boolean  @default(false)
+  isActive        Boolean  @default(true)
+  availableFrom   DateTime?
+  availableUntil  DateTime?
+  requiresRenewal Boolean  @default(false)
+  sortOrder       Int      @default(0)
+  icon            String?
+  tags            String[] @default([])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  fieldMappings    FieldMapping[]
+  processInstances ProcessInstance[]
+  favorites        ProcessFavorite[]
+
+  @@unique([tenantId, name])
+  @@index([tenantId, isPublic, isActive])
+  @@map("process_templates")
+}
+
+model FieldMapping {
+  id                String          @id @default(uuid())
+  tenantId          String
+  processTemplateId String
+  processTemplate   ProcessTemplate @relation(fields: [processTemplateId], references: [id], onDelete: Cascade)
+  dbConnectionId    String
+  dbConnection      DbConnection    @relation(fields: [dbConnectionId], references: [id], onDelete: Cascade)
+  portalField       String
+  externalColumn    String
+  label             String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@unique([processTemplateId, portalField])
+  @@map("field_mappings")
+}
+
+// ─────────────────────────────────────────────
+// PROCESS INSTANCES
+// ─────────────────────────────────────────────
+
+model ProcessInstance {
+  id                String          @id @default(uuid())
+  tenantId          String
+  userId            String
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  processTemplateId String
+  processTemplate   ProcessTemplate @relation(fields: [processTemplateId], references: [id])
+
+  lfProcessId        String?
+  lfDocumentEntryId  String?
+  applicantName      String?
+  applicantEmail     String?
+  businessName       String?
+  submissionDate     DateTime?
+  status             ProcessStatus @default(PENDING)
+  statusLabel        String?
+  lastStatusDate     DateTime?
+  completionDate     DateTime?
+  renewalDate        DateTime?
+  renewalUrl         String?
+  assignedDepartment String?
+  assignedStaffName  String?
+  lastSyncedAt       DateTime?
+  rawData            Json?
+  startedAt          DateTime      @default(now())
+  cancelledAt        DateTime?
+  notes              String?       @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tenantId, userId])
+  @@index([tenantId, status])
+  @@index([userId, processTemplateId])
+  @@map("process_instances")
+}
+
+// ─────────────────────────────────────────────
+// FAVORITES
+// ─────────────────────────────────────────────
+
+model ProcessFavorite {
+  userId            String
+  processTemplateId String
+  tenantId          String
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  processTemplate   ProcessTemplate @relation(fields: [processTemplateId], references: [id], onDelete: Cascade)
+  createdAt         DateTime        @default(now())
+
+  @@id([userId, processTemplateId])
+  @@map("process_favorites")
+}
+
+// ─────────────────────────────────────────────
+// SYNC JOBS
+// ─────────────────────────────────────────────
+
+model SyncJob {
+  id               String       @id @default(uuid())
+  tenantId         String
+  tenant           Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  dbConnectionId   String
+  dbConnection     DbConnection @relation(fields: [dbConnectionId], references: [id], onDelete: Cascade)
+  cronExpression   String       @default("*/30 * * * *")
+  isActive         Boolean      @default(true)
+  lastRunAt        DateTime?
+  lastRunSuccess   Boolean?
+  lastRunError     String?      @db.Text
+  recordsProcessed Int?
+  failureCount     Int          @default(0)
+  circuitOpen      Boolean      @default(false)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  @@map("sync_jobs")
+}
+
+// ─────────────────────────────────────────────
+// MESSAGING
+// ─────────────────────────────────────────────
+
+model Message {
+  id                String   @id @default(uuid())
+  tenantId          String
+  tenant            Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  senderId          String
+  sender            User     @relation("MessageSender", fields: [senderId], references: [id])
+  subject           String
+  body              String   @db.Text
+  isGlobal          Boolean  @default(false)
+  processInstanceId String?
+  processName       String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  recipients MessageRecipient[]
+
+  @@index([tenantId, senderId])
+  @@map("messages")
+}
+
+model MessageRecipient {
+  id        String        @id @default(uuid())
+  messageId String
+  message   Message       @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status    MessageStatus @default(UNREAD)
+  readAt    DateTime?
+  createdAt DateTime      @default(now())
+
+  @@unique([messageId, userId])
+  @@map("message_recipients")
+}
+
+// ─────────────────────────────────────────────
+// NOTIFICATIONS
+// ─────────────────────────────────────────────
+
+model Notification {
+  id        String           @id @default(uuid())
+  tenantId  String
+  tenant    Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  body      String           @db.Text
+  isRead    Boolean          @default(false)
+  readAt    DateTime?
+  actionUrl String?
+  metadata  Json?
+  createdAt DateTime         @default(now())
+
+  @@index([tenantId, userId, isRead])
+  @@map("notifications")
+}
+
+// ─────────────────────────────────────────────
+// ACTIVITY LOGS
+// ─────────────────────────────────────────────
+
+model ActivityLog {
+  id         String      @id @default(uuid())
+  tenantId   String
+  tenant     Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  userId     String?
+  user       User?       @relation(fields: [userId], references: [id])
+  systemRole SystemRole?
+  action     String
+  entityType String?
+  entityId   String?
+  ipAddress  String?
+  userAgent  String?
+  severity   LogSeverity @default(INFO)
+  details    Json?
+  createdAt  DateTime    @default(now())
+
+  @@index([tenantId, createdAt])
+  @@index([tenantId, userId])
+  @@index([tenantId, action])
+  @@map("activity_logs")
+}
+
+// ─────────────────────────────────────────────
+// BACKUP
+// ─────────────────────────────────────────────
+
+model BackupConfig {
+  id              String                @id @default(uuid())
+  tenantId        String
+  tenant          Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name            String
+  destinationType BackupDestinationType
+  isActive        Boolean               @default(true)
+  cronExpression  String?
+  configEncrypted String                @db.Text
+  retentionDays   Int                   @default(30)
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  backupRuns BackupRun[]
+
+  @@map("backup_configs")
+}
+
+model BackupRun {
+  id             String       @id @default(uuid())
+  backupConfigId String
+  backupConfig   BackupConfig @relation(fields: [backupConfigId], references: [id], onDelete: Cascade)
+  status         BackupStatus @default(PENDING)
+  startedAt      DateTime     @default(now())
+  completedAt    DateTime?
+  fileSize       BigInt?
+  filePath       String?
+  errorMessage   String?      @db.Text
+  createdAt      DateTime     @default(now())
+
+  @@map("backup_runs")
+}
+
+// ─────────────────────────────────────────────
+// SECURITY
+// ─────────────────────────────────────────────
+
+model IpRule {
+  id          String   @id @default(uuid())
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  ipOrCidr    String
+  isWhitelist Boolean
+  description String?
+  createdAt   DateTime @default(now())
+
+  @@index([tenantId, isWhitelist])
+  @@map("ip_rules")
+}
+
+model BlockedCountry {
+  id          String   @id @default(uuid())
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  countryCode String
+  countryName String
+  createdAt   DateTime @default(now())
+
+  @@unique([tenantId, countryCode])
+  @@map("blocked_countries")
+}
+
+model AllowedZipCode {
+  id        String   @id @default(uuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  zipCode   String
+  city      String?
+  state     String?
+  createdAt DateTime @default(now())
+
+  @@unique([tenantId, zipCode])
+  @@map("allowed_zip_codes")
+}
+
+// ─────────────────────────────────────────────
+// LANGUAGE FILES
+// ─────────────────────────────────────────────
+
+model LanguageFile {
+  id          String   @id @default(uuid())
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  code        String
+  name        String
+  isDefault   Boolean  @default(false)
+  isBuiltIn   Boolean  @default(false)
+  content     Json
+  isComplete  Boolean  @default(true)
+  missingKeys String[] @default([])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([tenantId, code])
+  @@map("language_files")
+}

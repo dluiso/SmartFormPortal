@@ -1,0 +1,102 @@
+version: '3.9'
+
+services:
+  # ─────────────────────────────
+  # Next.js Application
+  # ─────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: sfp_app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://sfp_user:sfp_password@postgres:5432/smartformportal?schema=public
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=${JWT_SECRET:-dev_jwt_secret_change_in_production_min_64_chars_long}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-8h}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-dev_32_char_key_change_prod!!}
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+      - NODE_ENV=development
+      - LICENSE_SERVER_URL=${LICENSE_SERVER_URL:-}
+      - LICENSE_PUBLIC_KEY=${LICENSE_PUBLIC_KEY:-}
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - sfp_network
+
+  # ─────────────────────────────
+  # PostgreSQL
+  # ─────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: sfp_postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: sfp_user
+      POSTGRES_PASSWORD: sfp_password
+      POSTGRES_DB: smartformportal
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sfp_user -d smartformportal"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - sfp_network
+
+  # ─────────────────────────────
+  # Redis
+  # ─────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: sfp_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --requirepass ""
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - sfp_network
+
+  # ─────────────────────────────
+  # Adminer (DB GUI for dev only)
+  # ─────────────────────────────
+  adminer:
+    image: adminer:latest
+    container_name: sfp_adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - sfp_network
+    profiles:
+      - dev-tools
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  sfp_network:
+    driver: bridge
