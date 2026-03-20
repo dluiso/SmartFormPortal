@@ -70,7 +70,8 @@ export async function POST(req: NextRequest) {
   const portalDomain = parsed.data.domain
     ?? process.env.SMFP_PORTAL_DOMAIN
     ?? process.env.NEXTAUTH_URL
-    ?? 'localhost';
+    ?? process.env.NEXT_PUBLIC_APP_URL
+    ?? 'http://localhost';
 
   try {
     const res = await fetch(`${serverUrl}/api/licenses/activate`, {
