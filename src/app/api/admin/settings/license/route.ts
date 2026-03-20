@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { verifyAccessToken } from '@/lib/auth/jwt';
 import prisma from '@/lib/db/prisma';
 import { z } from 'zod';
+import { ACCESS_TOKEN_COOKIE } from '@/lib/auth/session';
 
 function maskLicenseKey(key: string): string {
   if (key.length <= 12) return '****';
@@ -11,7 +12,7 @@ function maskLicenseKey(key: string): string {
 
 async function requireAdmin(req: NextRequest) {
   const cookieStore = await cookies();
-  const token = cookieStore.get('access_token')?.value ?? '';
+  const token = cookieStore.get(ACCESS_TOKEN_COOKIE)?.value ?? '';
   try {
     const payload = verifyAccessToken(token);
     if (payload.systemRole !== 'SUPER_ADMIN') return null;
@@ -59,8 +60,8 @@ export async function POST(req: NextRequest) {
   const parsed = ActivateSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
 
-  const serverUrl = process.env.SMFP_LICENSE_SERVER_URL;
-  const apiKey = process.env.SMFP_LICENSE_API_KEY;
+  const serverUrl = process.env.LICENSE_SERVER_URL;
+  const apiKey = process.env.LICENSE_SERVER_API_KEY;
 
   if (!serverUrl || !apiKey) {
     return NextResponse.json({ error: 'License server not configured' }, { status: 503 });

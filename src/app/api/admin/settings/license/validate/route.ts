@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { verifyAccessToken } from '@/lib/auth/jwt';
 import { validateTenantLicense } from '@/lib/license/validator';
+import { ACCESS_TOKEN_COOKIE } from '@/lib/auth/session';
 
 export async function POST(req: NextRequest) {
   const cookieStore = await cookies();
-  const token = cookieStore.get('access_token')?.value ?? '';
+  const token = cookieStore.get(ACCESS_TOKEN_COOKIE)?.value ?? '';
   let payload;
   try {
     payload = verifyAccessToken(token);
