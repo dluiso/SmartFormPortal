@@ -93,8 +93,11 @@ export async function POST(req: NextRequest) {
     }
 
     const data = await res.json() as {
-      payload: { plan: string; maxUsers: number; maxProcesses: number; expiresAt: string | null };
+      activated: boolean;
+      license: { planType: string; maxUsers: number; maxProcesses: number; expiresAt: string | null };
     };
+
+    const licenseData = data.license;
 
     const updated = await prisma.tenantLicense.upsert({
       where: { tenantId: admin.tenantId },
@@ -104,7 +107,7 @@ export async function POST(req: NextRequest) {
         licenseType: 'GOVERNMENTAL',
         isActive: true,
         activatedAt: new Date(),
-        expiresAt: data.payload.expiresAt ? new Date(data.payload.expiresAt) : null,
+        expiresAt: licenseData.expiresAt ? new Date(licenseData.expiresAt) : null,
         domain: portalDomain,
         rawLicense: JSON.stringify(data),
       },
@@ -112,7 +115,7 @@ export async function POST(req: NextRequest) {
         licenseKey: parsed.data.licenseKey,
         isActive: true,
         activatedAt: new Date(),
-        expiresAt: data.payload.expiresAt ? new Date(data.payload.expiresAt) : null,
+        expiresAt: licenseData.expiresAt ? new Date(licenseData.expiresAt) : null,
         domain: portalDomain,
         rawLicense: JSON.stringify(data),
       },
