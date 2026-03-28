@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db/prisma';
 import { verifyAccessToken } from '@/lib/auth/jwt';
 import { ProcessStatus } from '@prisma/client';
+import { ACCESS_TOKEN_COOKIE } from '@/lib/auth/session';
 
 export async function POST(
   req: NextRequest,
@@ -10,7 +11,7 @@ export async function POST(
   const { id: templateId } = await params;
 
   // Auth
-  const token = req.cookies.get('access_token')?.value;
+  const token = req.cookies.get(ACCESS_TOKEN_COOKIE)?.value;
   if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   let payload: { userId: string; tenantId: string };
