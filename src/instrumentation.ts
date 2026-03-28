@@ -20,27 +20,30 @@ export async function register() {
   }
 
   // ── License validation ───────────────────────────────────────────────────
-  try {
-    const { validateTenantLicense, getDefaultTenantId } = await import('@/lib/license/validator');
+  const { validateTenantLicense, getDefaultTenantId } = await import(
+    '@/lib/license/validator'
+  );
 
-    const tenantId = await getDefaultTenantId();
-    if (tenantId) {
-      const status = await validateTenantLicense(tenantId);
-      if (!status.valid) {
-        console.error(`[License] ⚠ License invalid: ${status.reason}`);
+  async function runValidation() {
+    try {
+      const tenantId = await getDefaultTenantId();
+      if (!tenantId) {
+        console.log('[License] No tenant found — skipping license validation');
+        return;
       }
-
-      // Schedule re-validation every 24h
-      const INTERVAL_MS = 24 * 60 * 60 * 1000;
-      setInterval(async () => {
-        try {
-          await validateTenantLicense(tenantId);
-        } catch (e) {
-          console.warn('[License] Periodic re-validation error:', (e as Error).message);
-        }
-      }, INTERVAL_MS);
+      const status = await validateTenantLicense(tenantId);
+      const label = status.valid ? '✓ valid' : '✗ invalid';
+      const detail = status.planName ?? status.plan ?? status.reason ?? '';
+      console.log(`[License] Startup check: ${label}${detail ? ` — ${detail}` : ''}`);
+    } catch (err) {
+      console.error('[License] Startup validation error:', err);
     }
-  } catch (err) {
-    console.warn('[Instrumentation] License validation skipped:', (err as Error).message);
   }
+
+  // Run immediately on startup
+  runValidation();
+
+  // Re-validate every 24 hours
+  const INTERVAL_MS = 24 * 60 * 60 * 1000;
+  setInterval(runValidation, INTERVAL_MS);
 }

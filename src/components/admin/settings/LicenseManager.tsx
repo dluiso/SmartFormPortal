@@ -8,6 +8,7 @@ type LicenseInfo = {
   id: string;
   licenseKey: string;
   licenseType: string;
+  planName?: string;
   isActive: boolean;
   activatedAt: string | null;
   expiresAt: string | null;
@@ -60,7 +61,7 @@ export default function LicenseManager({ initial }: { initial: LicenseInfo | nul
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ licenseKey: key }),
       });
-      const data = await res.json() as { ok?: boolean; license?: LicenseInfo; error?: string };
+      const data = await res.json() as { ok?: boolean; license?: LicenseInfo & { planName?: string }; error?: string };
       if (!res.ok) {
         setActivateError(data.error ?? 'Failed');
         return;
@@ -111,6 +112,9 @@ export default function LicenseManager({ initial }: { initial: LicenseInfo | nul
           <Row label={t('license_type')} value={
             t(`types.${license.licenseType.toLowerCase()}` as never) ?? license.licenseType
           } />
+          {license.planName && (
+            <Row label={t('plan_name')} value={license.planName} />
+          )}
           <Row label={t('expires_at')} value={
             license.expiresAt ? new Date(license.expiresAt).toLocaleDateString() : '∞'
           } />

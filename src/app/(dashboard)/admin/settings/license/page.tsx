@@ -5,6 +5,11 @@ import prisma from '@/lib/db/prisma';
 import LicenseManager from '@/components/admin/settings/LicenseManager';
 import { ACCESS_TOKEN_COOKIE } from '@/lib/auth/session';
 
+function maskLicenseKey(key: string): string {
+  if (key.length <= 12) return '****';
+  return `${key.slice(0, 8)}…${key.slice(-4)}`;
+}
+
 export default async function LicenseSettingsPage() {
   const t = await getTranslations('admin.settings.license');
 
@@ -19,10 +24,18 @@ export default async function LicenseSettingsPage() {
       where: { tenantId: payload.tenantId },
     });
     if (license) {
+      // Extract planName from stored rawLicense
+      let planName: string | undefined;
+      try {
+        const raw = JSON.parse(license.rawLicense ?? '{}') as { license?: { planName?: string; planType?: string } };
+        planName = raw.license?.planName ?? raw.license?.planType;
+      } catch { /* ignore */ }
+
       licenseData = {
         id: license.id,
-        licenseKey: license.licenseKey,
+        licenseKey: maskLicenseKey(license.licenseKey),
         licenseType: license.licenseType,
+        planName,
         isActive: license.isActive,
         activatedAt: license.activatedAt?.toISOString() ?? null,
         expiresAt: license.expiresAt?.toISOString() ?? null,

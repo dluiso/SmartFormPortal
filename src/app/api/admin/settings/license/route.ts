@@ -94,8 +94,29 @@ export async function POST(req: NextRequest) {
 
     const data = await res.json() as {
       activated: boolean;
-      license: { planType: string; maxUsers: number; maxProcesses: number; expiresAt: string | null };
+      license: {
+        licenseKey: string;
+        customerId: string;
+        customerEmail: string;
+        planType: string;
+        maxUsers: number;
+        maxProcesses: number;
+        allowedDomains: string[];
+        issuedAt: string;
+        expiresAt: string | null;
+        signature: string;
+        publicKey: string;
+        planName: string;
+      };
     };
+
+    // Verify RSA signature
+    const { verifyLicenseSignature, getLicensePublicKey } = await import('@/lib/license/verifier');
+    const { signature, publicKey: responsePubKey, planName, ...licensePayload } = data.license;
+    const publicKeyPem = getLicensePublicKey() ?? responsePubKey;
+    if (!verifyLicenseSignature(licensePayload, signature, publicKeyPem)) {
+      return NextResponse.json({ error: 'License signature verification failed' }, { status: 400 });
+    }
 
     const licenseData = data.license;
 
@@ -121,12 +142,17 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({
+    // Issue signed license cookie (1h TTL)
+    const { makeLicenseCookieValue, LICENSE_COOKIE_NAME } = await import('@/lib/license/cookieCache');
+    const cookieValue = await makeLicenseCookieValue(true, process.env.JWT_SECRET ?? '');
+
+    const response = NextResponse.json({
       ok: true,
       license: {
         id: updated.id,
         licenseKey: maskLicenseKey(updated.licenseKey),
         licenseType: updated.licenseType,
+        planName: planName ?? licenseData.planType,
         isActive: updated.isActive,
         activatedAt: updated.activatedAt?.toISOString() ?? null,
         expiresAt: updated.expiresAt?.toISOString() ?? null,
@@ -134,6 +160,13 @@ export async function POST(req: NextRequest) {
         lastValidatedAt: updated.updatedAt.toISOString(),
       },
     });
+    response.cookies.set(LICENSE_COOKIE_NAME, cookieValue, {
+      httpOnly: true,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 3600,
+    });
+    return response;
   } catch {
     return NextResponse.json({ error: 'License server unreachable. Please try again.' }, { status: 503 });
   }

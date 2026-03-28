@@ -1,11 +1,11 @@
 /**
  * License validation against SMFP-LicenseServer.
- *
- * Called once at server startup and scheduled every 24h via BullMQ.
+ * Called at server startup (instrumentation.ts) and on-demand by the admin UI.
  * 72-hour grace period if the License Server is unreachable.
  */
 
 import prisma from '@/lib/db/prisma';
+import { verifyLicenseSignature, getLicensePublicKey } from './verifier';
 
 const GRACE_PERIOD_MS = 72 * 60 * 60 * 1000; // 72 hours
 
@@ -14,14 +14,11 @@ export interface LicenseStatus {
   reason?: string;
   expiresAt?: Date | null;
   plan?: string;
+  planName?: string;
   maxUsers?: number;
   maxProcesses?: number;
 }
 
-/**
- * Validates the tenant license against the License Server.
- * Returns the status — caller decides what to do (log, block, alert).
- */
 export async function validateTenantLicense(tenantId: string): Promise<LicenseStatus> {
   const license = await prisma.tenantLicense.findUnique({ where: { tenantId } });
 
@@ -29,16 +26,19 @@ export async function validateTenantLicense(tenantId: string): Promise<LicenseSt
     return { valid: false, reason: 'No license record found' };
   }
 
-  const serverUrl = process.env.SMFP_LICENSE_SERVER_URL;
-  const apiKey = process.env.SMFP_LICENSE_API_KEY;
+  const serverUrl = process.env.LICENSE_SERVER_URL;
+  const apiKey = process.env.LICENSE_SERVER_API_KEY;
 
   if (!serverUrl || !apiKey) {
-    // No license server configured — fall back to local record
-    console.warn('[License] SMFP_LICENSE_SERVER_URL or SMFP_LICENSE_API_KEY not set — using local record');
+    console.warn('[License] LICENSE_SERVER_URL or LICENSE_SERVER_API_KEY not set — using local record');
     return localFallback(license);
   }
 
-  const portalDomain = process.env.SMFP_PORTAL_DOMAIN ?? process.env.NEXTAUTH_URL ?? 'localhost';
+  const portalDomain =
+    process.env.SMFP_PORTAL_DOMAIN ??
+    process.env.NEXTAUTH_URL ??
+    process.env.NEXT_PUBLIC_APP_URL ??
+    'http://localhost';
 
   try {
     const res = await fetch(`${serverUrl}/api/licenses/validate`, {
@@ -58,34 +58,56 @@ export async function validateTenantLicense(tenantId: string): Promise<LicenseSt
       const data = await res.json().catch(() => ({}));
       const reason = (data as { error?: string }).error ?? `HTTP ${res.status}`;
       console.warn(`[License] Validation failed: ${reason}`);
-
-      // Use grace period
       return gracePeriodCheck(license, reason);
     }
 
     const data = await res.json() as {
-      payload: { plan: string; maxUsers: number; maxProcesses: number; expiresAt: string | null };
+      valid: boolean;
+      license: {
+        licenseKey: string;
+        customerId: string;
+        customerEmail: string;
+        planType: string;
+        maxUsers: number;
+        maxProcesses: number;
+        allowedDomains: string[];
+        issuedAt: string;
+        expiresAt: string | null;
+        signature: string;
+        publicKey: string;
+        planName: string;
+        customerName: string;
+      };
     };
 
-    // Update local record with latest info
+    // Verify RSA signature if public key is configured
+    const publicKeyPem = getLicensePublicKey() ?? data.license.publicKey;
+    const { signature, publicKey: _pk, planName: _pn, customerName: _cn, ...licensePayload } = data.license;
+    if (!verifyLicenseSignature(licensePayload, signature, publicKeyPem)) {
+      console.error('[License] RSA signature verification FAILED — response may be tampered');
+      return gracePeriodCheck(license, 'Signature verification failed');
+    }
+
+    // Update local record with verified info
     await prisma.tenantLicense.update({
       where: { tenantId },
       data: {
         isActive: true,
-        expiresAt: data.payload.expiresAt ? new Date(data.payload.expiresAt) : null,
+        expiresAt: data.license.expiresAt ? new Date(data.license.expiresAt) : null,
         rawLicense: JSON.stringify(data),
         updatedAt: new Date(),
       },
     });
 
-    console.log(`[License] Validated ✓ — plan: ${data.payload.plan}`);
+    console.log(`[License] Validated ✓ — plan: ${data.license.planName ?? data.license.planType}`);
 
     return {
       valid: true,
-      expiresAt: data.payload.expiresAt ? new Date(data.payload.expiresAt) : null,
-      plan: data.payload.plan,
-      maxUsers: data.payload.maxUsers,
-      maxProcesses: data.payload.maxProcesses,
+      expiresAt: data.license.expiresAt ? new Date(data.license.expiresAt) : null,
+      plan: data.license.planType,
+      planName: data.license.planName,
+      maxUsers: data.license.maxUsers,
+      maxProcesses: data.license.maxProcesses,
     };
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
@@ -106,6 +128,11 @@ function gracePeriodCheck(
     return { valid: true, reason: `Grace period (${hoursLeft}h left)`, expiresAt: license.expiresAt };
   }
 
+  // Grace period exhausted — mark inactive in DB
+  prisma.tenantLicense
+    .updateMany({ where: { isActive: true, updatedAt: { lt: new Date(Date.now() - GRACE_PERIOD_MS) } }, data: { isActive: false } })
+    .catch(() => {});
+
   return { valid: false, reason };
 }
 
@@ -117,9 +144,7 @@ function localFallback(license: { isActive: boolean; expiresAt: Date | null }): 
   return { valid: true, expiresAt: license.expiresAt };
 }
 
-/**
- * Returns the first (and only) tenant ID — single-tenant mode.
- */
+/** Returns the first (and only) tenant ID — single-tenant mode. */
 export async function getDefaultTenantId(): Promise<string | null> {
   const tenant = await prisma.tenant.findFirst({ select: { id: true } });
   return tenant?.id ?? null;

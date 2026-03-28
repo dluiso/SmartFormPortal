@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { verifyAccessToken } from '@/lib/auth/jwt';
 import { validateTenantLicense } from '@/lib/license/validator';
 import { ACCESS_TOKEN_COOKIE } from '@/lib/auth/session';
+import { makeLicenseCookieValue, LICENSE_COOKIE_NAME } from '@/lib/license/cookieCache';
 
 export async function POST(req: NextRequest) {
   const cookieStore = await cookies();
@@ -18,5 +19,13 @@ export async function POST(req: NextRequest) {
   }
 
   const status = await validateTenantLicense(payload.tenantId);
-  return NextResponse.json(status);
+  const cookieValue = await makeLicenseCookieValue(status.valid, process.env.JWT_SECRET ?? '');
+  const response = NextResponse.json(status);
+  response.cookies.set(LICENSE_COOKIE_NAME, cookieValue, {
+    httpOnly: true,
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 3600,
+  });
+  return response;
 }

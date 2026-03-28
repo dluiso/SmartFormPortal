@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getClientIp, isIpInList } from '@/lib/security/ipUtils';
 import { ACCESS_TOKEN_COOKIE } from '@/lib/auth/session';
 import { SystemRole } from '@prisma/client';
+import { readLicenseCookie, makeLicenseCookieValue, LICENSE_COOKIE_NAME } from '@/lib/license/cookieCache';
 
 // Edge Runtime-compatible JWT verification (jsonwebtoken requires Node.js crypto)
 async function verifyJWT(token: string, secret: string): Promise<{ userId: string; tenantId: string; email: string; systemRole: SystemRole; publicId: string }> {
@@ -47,6 +48,7 @@ const PUBLIC_ROUTES = [
   '/api/auth/2fa/verify',
   '/api/setup',
   '/api/health',
+  '/api/license-check',
 ];
 
 const ADMIN_ROUTES = ['/admin', '/api/admin'];
@@ -211,14 +213,71 @@ export async function middleware(request: NextRequest) {
       }
     }
 
-    // ── Step 10: Inject user info into request headers for server components
+    // ── Step 10: License enforcement
+    const isLicenseExempt =
+      pathname.startsWith('/admin/settings/license') ||
+      pathname.startsWith('/api/admin/settings/license') ||
+      pathname.startsWith('/api/license-check');
+
+    let newLicenseCookieValue: string | undefined;
+
+    if (!isLicenseExempt) {
+      const jwtSecret = process.env.JWT_SECRET ?? '';
+      const licCookieRaw = request.cookies.get(LICENSE_COOKIE_NAME)?.value ?? '';
+      let licenseOk: boolean | null = licCookieRaw
+        ? await readLicenseCookie(licCookieRaw, jwtSecret)
+        : null;
+
+      if (licenseOk === null) {
+        // Cookie missing/expired — re-check DB via dedicated endpoint
+        try {
+          const checkRes = await fetch(new URL('/api/license-check', request.url), {
+            signal: AbortSignal.timeout(3000),
+          });
+          const checkData = await checkRes.json() as { valid: boolean };
+          licenseOk = checkData.valid;
+          newLicenseCookieValue = await makeLicenseCookieValue(licenseOk, jwtSecret);
+        } catch {
+          licenseOk = true; // fail open on network error — don't block users
+        }
+      }
+
+      if (licenseOk === false) {
+        const isAdminUser =
+          payload.systemRole === SystemRole.SUPER_ADMIN ||
+          payload.systemRole === SystemRole.ADMIN;
+        if (isApiRoute(pathname)) {
+          return NextResponse.json(
+            { error: 'License required', code: 'LICENSE_INVALID' },
+            { status: 402 }
+          );
+        }
+        return NextResponse.redirect(
+          new URL(
+            isAdminUser ? '/admin/settings/license' : '/license-required',
+            request.url
+          )
+        );
+      }
+    }
+
+    // ── Step 11: Inject user info into request headers for server components
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set('x-user-id', payload.userId);
     requestHeaders.set('x-tenant-id', payload.tenantId);
     requestHeaders.set('x-user-role', payload.systemRole);
     requestHeaders.set('x-user-public-id', payload.publicId);
 
-    return NextResponse.next({ request: { headers: requestHeaders } });
+    const response = NextResponse.next({ request: { headers: requestHeaders } });
+    if (newLicenseCookieValue) {
+      response.cookies.set(LICENSE_COOKIE_NAME, newLicenseCookieValue, {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 3600,
+      });
+    }
+    return response;
   } catch {
     // Token invalid or expired
     const response = isApiRoute(pathname)
