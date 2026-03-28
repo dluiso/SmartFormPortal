@@ -1,13 +1,14 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Roboto_Serif } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 import { Toaster } from '@/components/ui/sonner';
 import './globals.css';
 
-const inter = Inter({
-  variable: '--font-inter',
+const robotoSerif = Roboto_Serif({
+  variable: '--font-roboto-serif',
   subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
 });
 
 export const metadata: Metadata = {
@@ -25,7 +26,7 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className={`${robotoSerif.variable} font-sans antialiased`}>
         <NextIntlClientProvider messages={messages} locale={locale}>
           {children}
           <Toaster position="top-right" richColors closeButton />

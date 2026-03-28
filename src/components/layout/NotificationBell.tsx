@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Bell, Check, CheckCheck, ExternalLink } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
 
 interface Notification {
@@ -22,7 +21,6 @@ export default function NotificationBell() {
   const [loading, setLoading] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
-  // Close on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
@@ -33,7 +31,6 @@ export default function NotificationBell() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, [open]);
 
-  // Fetch unread count on mount + every 60s
   useEffect(() => {
     fetchCount();
     const interval = setInterval(fetchCount, 60_000);
@@ -46,9 +43,7 @@ export default function NotificationBell() {
       if (!res.ok) return;
       const data = await res.json();
       setUnreadCount(data.unreadCount ?? 0);
-    } catch {
-      // ignore
-    }
+    } catch { /* ignore */ }
   }
 
   async function fetchNotifications() {
@@ -59,9 +54,7 @@ export default function NotificationBell() {
       const data = await res.json();
       setNotifications(data.notifications ?? []);
       setUnreadCount(data.unreadCount ?? 0);
-    } catch {
-      // ignore
-    } finally {
+    } catch { /* ignore */ } finally {
       setLoading(false);
     }
   }
@@ -75,9 +68,7 @@ export default function NotificationBell() {
 
   const markRead = async (id: string) => {
     await fetch(`/api/notifications/${id}/read`, { method: 'PATCH' });
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
-    );
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)));
     setUnreadCount((c) => Math.max(0, c - 1));
   };
 
@@ -91,7 +82,7 @@ export default function NotificationBell() {
     <div className="relative" ref={panelRef}>
       <button
         onClick={handleOpen}
-        className="relative p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+        className="relative p-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
         aria-label="Notifications"
       >
         <Bell className="w-5 h-5" />
@@ -103,14 +94,14 @@ export default function NotificationBell() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-80 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl z-50 overflow-hidden">
+        <div className="absolute right-0 top-full mt-2 w-80 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700">
-            <span className="text-sm font-semibold text-white">Notifications</span>
+          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+            <span className="text-sm font-semibold text-slate-900">Notifications</span>
             {unreadCount > 0 && (
               <button
                 onClick={markAllRead}
-                className="flex items-center gap-1 text-xs text-slate-400 hover:text-white transition-colors"
+                className="flex items-center gap-1 text-xs text-slate-500 hover:text-blue-600 transition-colors"
               >
                 <CheckCheck className="w-3.5 h-3.5" />
                 Mark all read
@@ -119,25 +110,25 @@ export default function NotificationBell() {
           </div>
 
           {/* List */}
-          <div className="max-h-96 overflow-y-auto">
+          <div className="max-h-96 overflow-y-auto divide-y divide-slate-100">
             {loading ? (
-              <div className="py-8 text-center text-slate-500 text-sm">Loading...</div>
+              <div className="py-8 text-center text-slate-400 text-sm">Loading...</div>
             ) : notifications.length === 0 ? (
-              <div className="py-8 text-center text-slate-500 text-sm">No notifications</div>
+              <div className="py-8 text-center text-slate-400 text-sm">No notifications</div>
             ) : (
               notifications.map((n) => (
                 <div
                   key={n.id}
-                  className={`flex items-start gap-3 px-4 py-3 border-b border-slate-700/50 hover:bg-slate-700/30 transition-colors ${
-                    !n.isRead ? 'bg-blue-950/20' : ''
+                  className={`flex items-start gap-3 px-4 py-3 hover:bg-slate-50 transition-colors ${
+                    !n.isRead ? 'bg-blue-50/60' : ''
                   }`}
                 >
                   <div className="flex-1 min-w-0">
-                    <p className={`text-sm font-medium truncate ${n.isRead ? 'text-slate-300' : 'text-white'}`}>
+                    <p className={`text-sm font-medium truncate ${n.isRead ? 'text-slate-600' : 'text-slate-900'}`}>
                       {n.title}
                     </p>
                     <p className="text-xs text-slate-500 line-clamp-2 mt-0.5">{n.body}</p>
-                    <p className="text-xs text-slate-600 mt-1">
+                    <p className="text-xs text-slate-400 mt-1">
                       {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })}
                     </p>
                   </div>
@@ -145,7 +136,7 @@ export default function NotificationBell() {
                     {!n.isRead && (
                       <button
                         onClick={() => markRead(n.id)}
-                        className="text-slate-600 hover:text-blue-400 transition-colors"
+                        className="text-slate-300 hover:text-blue-500 transition-colors"
                         title="Mark as read"
                       >
                         <Check className="w-3.5 h-3.5" />
@@ -155,7 +146,7 @@ export default function NotificationBell() {
                       <a
                         href={n.actionUrl}
                         onClick={() => { if (!n.isRead) markRead(n.id); setOpen(false); }}
-                        className="text-slate-600 hover:text-slate-400 transition-colors"
+                        className="text-slate-300 hover:text-slate-500 transition-colors"
                         title="Open"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
@@ -169,11 +160,11 @@ export default function NotificationBell() {
 
           {/* Footer */}
           {notifications.length > 0 && (
-            <div className="px-4 py-2.5 border-t border-slate-700">
+            <div className="px-4 py-2.5 border-t border-slate-100 bg-slate-50">
               <a
                 href="/my-processes"
                 onClick={() => setOpen(false)}
-                className="text-xs text-slate-500 hover:text-slate-300 transition-colors"
+                className="text-xs text-slate-500 hover:text-blue-600 font-medium transition-colors"
               >
                 View all activity →
               </a>

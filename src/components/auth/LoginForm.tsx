@@ -56,13 +56,11 @@ export default function LoginForm() {
         return;
       }
 
-      // 2FA required — redirect to 2FA challenge page
       if (data.requires2FA) {
         router.push('/2fa');
         return;
       }
 
-      // Set locale cookie based on user preference
       if (data.user?.preferredLanguage) {
         document.cookie = `locale=${data.user.preferredLanguage};path=/;max-age=31536000`;
       }
@@ -80,37 +78,40 @@ export default function LoginForm() {
     <div className="w-full max-w-md">
       {/* Logo */}
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-14 h-14 bg-blue-600 rounded-2xl mb-4">
+        <div className="inline-flex items-center justify-center w-14 h-14 bg-blue-600 rounded-2xl mb-4 shadow-lg shadow-blue-600/30">
           <Building2 className="w-7 h-7 text-white" />
         </div>
-        <h1 className="text-xl font-bold text-white">SmartFormPortal</h1>
+        <h1 className="text-xl font-bold text-slate-900">SmartFormPortal</h1>
+        <p className="text-sm text-slate-500 mt-1">Secure access portal</p>
       </div>
 
       {/* Card */}
-      <div className="bg-slate-800/80 backdrop-blur border border-slate-700 rounded-2xl p-8 shadow-2xl">
-        <h2 className="text-xl font-bold text-white mb-1">{t('title')}</h2>
-        <p className="text-slate-400 text-sm mb-6">{t('subtitle')}</p>
+      <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-xl shadow-slate-200/60">
+        <h2 className="text-xl font-bold text-slate-900 mb-1">{t('title')}</h2>
+        <p className="text-slate-500 text-sm mb-6">{t('subtitle')}</p>
 
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           <div>
-            <Label className="text-slate-300 mb-1.5 block">{t('email_label')}</Label>
+            <Label className="text-slate-700 text-sm font-medium mb-1.5 block">
+              {t('email_label')}
+            </Label>
             <Input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder={t('email_placeholder')}
               autoComplete="email"
-              className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 focus:border-blue-500"
+              className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
             />
-            {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
+            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
           </div>
 
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <Label className="text-slate-300">{t('password_label')}</Label>
+              <Label className="text-slate-700 text-sm font-medium">{t('password_label')}</Label>
               <Link
                 href="/forgot-password"
-                className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                className="text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors"
               >
                 {t('forgot_password')}
               </Link>
@@ -122,22 +123,26 @@ export default function LoginForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder={t('password_placeholder')}
                 autoComplete="current-password"
-                className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 focus:border-blue-500 pr-10"
+                className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500 pr-10"
               />
               <button
                 type="button"
                 onClick={() => setShowPass(!showPass)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
               >
                 {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
             {errors.password && (
-              <p className="text-red-400 text-xs mt-1">{errors.password}</p>
+              <p className="text-red-500 text-xs mt-1">{errors.password}</p>
             )}
           </div>
 
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button
+            type="submit"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+            disabled={loading}
+          >
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -149,9 +154,12 @@ export default function LoginForm() {
           </Button>
         </form>
 
-        <p className="text-center text-sm text-slate-400 mt-6">
+        <p className="text-center text-sm text-slate-500 mt-6">
           {t('no_account')}{' '}
-          <Link href="/register" className="text-blue-400 hover:text-blue-300 font-medium transition-colors">
+          <Link
+            href="/register"
+            className="text-blue-600 hover:text-blue-700 font-semibold transition-colors"
+          >
             {t('register_link')}
           </Link>
         </p>

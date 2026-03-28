@@ -7,7 +7,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
+  --font-sans: var(--font-roboto-serif);
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -47,39 +47,40 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* ── Light theme design tokens ─────────────────────────────────────────────── */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --background: oklch(0.984 0.003 247.858);   /* slate-50  */
+  --foreground: oklch(0.129 0.042 264.695);   /* slate-900 */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.129 0.042 264.695);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.129 0.042 264.695);
+  --primary: oklch(0.546 0.245 262.881);       /* blue-600  */
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.968 0.007 247.896);     /* slate-100 */
+  --secondary-foreground: oklch(0.279 0.041 260.031);
+  --muted: oklch(0.968 0.007 247.896);
+  --muted-foreground: oklch(0.554 0.046 257.417); /* slate-500 */
+  --accent: oklch(0.951 0.026 236.824);        /* blue-50   */
+  --accent-foreground: oklch(0.366 0.178 260.659); /* blue-800 */
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
+  --border: oklch(0.929 0.013 255.508);        /* slate-200 */
+  --input: oklch(0.929 0.013 255.508);
+  --ring: oklch(0.546 0.245 262.881);          /* blue-600  */
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: oklch(0.129 0.042 264.695);
+  --sidebar-primary: oklch(0.546 0.245 262.881);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar-accent: oklch(0.951 0.026 236.824);
+  --sidebar-accent-foreground: oklch(0.366 0.178 260.659);
+  --sidebar-border: oklch(0.929 0.013 255.508);
+  --sidebar-ring: oklch(0.546 0.245 262.881);
 }
 
 .dark {
@@ -127,3 +128,95 @@
     @apply font-sans;
   }
 }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   Light-theme overrides — unlayered CSS (higher cascade priority than
+   Tailwind @layer utilities), so these win without !important.
+   They transform the hardcoded dark Tailwind classes used in admin
+   components into their light equivalents.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Form elements ────────────────────────────────────────────────────────── */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+textarea,
+select {
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+input::placeholder,
+textarea::placeholder {
+  color: #94a3b8;
+}
+input:focus:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+textarea:focus,
+select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgb(59 130 246 / 0.12);
+  outline: none;
+}
+
+/* ── Card / panel backgrounds ────────────────────────────────────────────── */
+.bg-slate-950  { background-color: #f8fafc; }
+.bg-slate-900  { background-color: #f8fafc; }
+.bg-slate-800  { background-color: #ffffff; }
+.bg-slate-700  { background-color: #ffffff; }
+
+/* Opacity variants */
+.bg-slate-800\/50  { background-color: rgb(255 255 255 / 0.97); }
+.bg-slate-800\/30  { background-color: rgb(248 250 252 / 0.7);  }
+.bg-slate-700\/30  { background-color: rgb(248 250 252 / 0.7);  }
+.bg-blue-950\/20   { background-color: rgb(239 246 255 / 0.6);  }
+
+/* ── Borders ─────────────────────────────────────────────────────────────── */
+.border-slate-800       { border-color: #e2e8f0; }
+.border-slate-700       { border-color: #e2e8f0; }
+.border-slate-700\/50   { border-color: #e2e8f0; }
+.border-slate-600       { border-color: #cbd5e1; }
+.border-blue-500\/50    { border-color: #93c5fd; }
+
+/* ── Text on formerly-dark surfaces ─────────────────────────────────────── */
+/* Only apply inside containers that were dark (now white) */
+.bg-slate-800 .text-white,
+.bg-slate-800\/50 .text-white,
+.bg-slate-800\/30 .text-white,
+.bg-slate-900 .text-white,
+.bg-slate-950 .text-white,
+.bg-slate-700 .text-white {
+  color: #0f172a;
+}
+
+.bg-slate-800 .text-slate-300,
+.bg-slate-800\/50 .text-slate-300,
+.bg-slate-900 .text-slate-300 {
+  color: #475569;
+}
+
+.bg-slate-800 .text-slate-400,
+.bg-slate-800\/50 .text-slate-400,
+.bg-slate-900 .text-slate-400,
+.bg-slate-700 .text-slate-400 {
+  color: #64748b;
+}
+
+.bg-slate-800 .text-slate-500,
+.bg-slate-800\/50 .text-slate-500,
+.bg-slate-900 .text-slate-500,
+.bg-slate-700 .text-slate-500 {
+  color: #64748b;
+}
+
+.bg-slate-800 .text-slate-600,
+.bg-slate-800\/50 .text-slate-600 {
+  color: #475569;
+}
+
+/* Empty state backgrounds */
+.bg-slate-800\/30,
+.col-span-full .bg-slate-800\/30 {
+  background-color: #f8fafc;
+}
+
+/* ── Hover states on panels ──────────────────────────────────────────────── */
+.hover\:bg-slate-700\/30:hover { background-color: #f1f5f9; }
+.hover\:bg-slate-800:hover     { background-color: #f1f5f9; }

@@ -34,43 +34,49 @@ export default function Topbar({ session, onMenuToggle }: Props) {
   };
 
   return (
-    <header className="flex items-center justify-between h-14 px-4 md:px-6 bg-slate-900 border-b border-slate-800 flex-shrink-0">
-      {/* Left: Mobile menu button + breadcrumb */}
+    <header className="flex items-center justify-between h-14 px-4 md:px-6 bg-white border-b border-slate-200 flex-shrink-0 shadow-sm">
+      {/* Left: Mobile menu toggle */}
       <div className="flex items-center gap-3">
         <button
           onClick={onMenuToggle}
-          className="lg:hidden text-slate-400 hover:text-white transition-colors"
+          className="lg:hidden p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+          aria-label="Open menu"
         >
           <Menu className="w-5 h-5" />
         </button>
       </div>
 
       {/* Right: Notifications + Profile */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
         <NotificationBell />
 
-        {/* Profile dropdown */}
         <DropdownMenu>
-          <DropdownMenuTrigger className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-all focus:outline-none">
-            <div className="w-7 h-7 bg-blue-600/20 rounded-full flex items-center justify-center">
-              <span className="text-xs font-bold text-blue-400">
+          <DropdownMenuTrigger className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all focus:outline-none">
+            <div className="w-7 h-7 bg-blue-100 rounded-full flex items-center justify-center">
+              <span className="text-xs font-bold text-blue-700">
                 {session.email.charAt(0).toUpperCase()}
               </span>
             </div>
-            <span className="hidden md:block text-sm max-w-[120px] truncate">
+            <span className="hidden md:block text-sm font-medium max-w-[140px] truncate">
               {session.email}
             </span>
-            <ChevronDown className="w-3 h-3 hidden md:block" />
+            <ChevronDown className="w-3.5 h-3.5 hidden md:block text-slate-400" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48 bg-slate-800 border-slate-700">
-            <DropdownMenuItem className="text-slate-300 focus:text-white focus:bg-slate-700 cursor-pointer" onClick={() => router.push('/profile')}>
-              <User className="w-4 h-4 mr-2" />
+          <DropdownMenuContent
+            align="end"
+            className="w-48 bg-white border-slate-200 shadow-lg rounded-xl"
+          >
+            <DropdownMenuItem
+              className="text-slate-700 focus:text-slate-900 focus:bg-slate-100 cursor-pointer rounded-lg"
+              onClick={() => router.push('/profile')}
+            >
+              <User className="w-4 h-4 mr-2 text-slate-400" />
               {t('profile')}
             </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-slate-700" />
+            <DropdownMenuSeparator className="bg-slate-100" />
             <DropdownMenuItem
               onClick={handleLogout}
-              className="text-red-400 focus:text-red-300 focus:bg-slate-700 cursor-pointer"
+              className="text-red-600 focus:text-red-700 focus:bg-red-50 cursor-pointer rounded-lg"
             >
               <LogOut className="w-4 h-4 mr-2" />
               {t('logout')}
