@@ -60,6 +60,148 @@ const blank: FormState = {
   dbConnectionId: '',
 };
 
+// ── Extracted to module level to prevent remount on every render ──────────────
+interface SelectFieldProps {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: { id: string; name: string }[];
+  placeholder: string;
+}
+
+function SelectField({ label, value, onChange, options, placeholder }: SelectFieldProps) {
+  return (
+    <div>
+      <label className="block text-xs font-medium text-slate-400 mb-1">{label}</label>
+      <div className="relative">
+        <select
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 pr-8 appearance-none focus:outline-none focus:border-blue-500"
+        >
+          <option value="">{placeholder}</option>
+          {options.map((o) => (
+            <option key={o.id} value={o.id}>{o.name}</option>
+          ))}
+        </select>
+        <ChevronDown className="absolute right-2.5 top-2.5 w-4 h-4 text-slate-400 pointer-events-none" />
+      </div>
+    </div>
+  );
+}
+
+interface EditFormProps {
+  form: FormState;
+  setForm: (f: FormState) => void;
+  cancel: () => void;
+  handleSave: () => void;
+  saving: boolean;
+  categories: { id: string; name: string }[];
+  departments: { id: string; name: string }[];
+  dbConnections: { id: string; name: string }[];
+  tProc: ReturnType<typeof useTranslations>;
+}
+
+function EditForm({ form, setForm, cancel, handleSave, saving, categories, departments, dbConnections, tProc }: EditFormProps) {
+  const checkboxFields: { key: keyof FormState; label: string }[] = [
+    { key: 'isPublic', label: tProc('is_public') },
+    { key: 'isActive', label: 'Active' },
+    { key: 'requiresRenewal', label: tProc('requires_renewal') },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div>
+          <label className="block text-xs font-medium text-slate-400 mb-1">Name *</label>
+          <input
+            type="text"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+          />
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-slate-400 mb-1">{tProc('public_url')}</label>
+          <input
+            type="url"
+            value={form.publicUrl}
+            onChange={(e) => setForm({ ...form, publicUrl: e.target.value })}
+            className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+            placeholder="https://..."
+          />
+        </div>
+        <div className="md:col-span-2">
+          <label className="block text-xs font-medium text-slate-400 mb-1">Description</label>
+          <textarea
+            value={form.description}
+            onChange={(e) => setForm({ ...form, description: e.target.value })}
+            rows={2}
+            className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500 resize-none"
+          />
+        </div>
+        <SelectField label="Category" value={form.categoryId}
+          onChange={(v) => setForm({ ...form, categoryId: v })}
+          options={categories} placeholder="No category" />
+        <SelectField label="Department" value={form.departmentId}
+          onChange={(v) => setForm({ ...form, departmentId: v })}
+          options={departments} placeholder="No department" />
+        <SelectField label={tProc('db_connection')} value={form.dbConnectionId}
+          onChange={(v) => setForm({ ...form, dbConnectionId: v })}
+          options={dbConnections} placeholder="None (manual only)" />
+        <div>
+          <label className="block text-xs font-medium text-slate-400 mb-1">Sort Order</label>
+          <input
+            type="number"
+            value={form.sortOrder}
+            onChange={(e) => setForm({ ...form, sortOrder: Number(e.target.value) })}
+            className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+          />
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-slate-400 mb-1">{tProc('available_from')}</label>
+          <input
+            type="date"
+            value={form.availableFrom}
+            onChange={(e) => setForm({ ...form, availableFrom: e.target.value })}
+            className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+          />
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-slate-400 mb-1">{tProc('available_until')}</label>
+          <input
+            type="date"
+            value={form.availableUntil}
+            onChange={(e) => setForm({ ...form, availableUntil: e.target.value })}
+            className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+          />
+        </div>
+      </div>
+      <div className="flex flex-wrap gap-4">
+        {checkboxFields.map(({ key, label }) => (
+          <label key={key} className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={form[key] as boolean}
+              onChange={(e) => setForm({ ...form, [key]: e.target.checked })}
+              className="w-4 h-4 accent-blue-600"
+            />
+            <span className="text-sm text-slate-300">{label}</span>
+          </label>
+        ))}
+      </div>
+      <div className="flex gap-2 justify-end">
+        <Button variant="ghost" size="sm" onClick={cancel} className="text-slate-400">
+          <X className="w-3.5 h-3.5 mr-1" /> Cancel
+        </Button>
+        <Button size="sm" onClick={handleSave} disabled={saving} className="bg-blue-600 hover:bg-blue-700">
+          <Check className="w-3.5 h-3.5 mr-1" /> Save
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export default function ProcessTemplatesManager({ templates: init, categories, departments, dbConnections }: Props) {
   const t = useTranslations('admin.processes');
   const [items, setItems] = useState(init);
@@ -83,7 +225,7 @@ export default function ProcessTemplatesManager({ templates: init, categories, d
   });
 
   const startCreate = () => { setEditId('new'); setForm(blank); };
-  const startEdit = (t: Template) => { setEditId(t.id); setForm(toForm(t)); };
+  const startEdit = (tmpl: Template) => { setEditId(tmpl.id); setForm(toForm(tmpl)); };
   const cancel = () => setEditId(null);
 
   const handleSave = async () => {
@@ -160,135 +302,6 @@ export default function ProcessTemplatesManager({ templates: init, categories, d
     }
   };
 
-  const SelectField = ({
-    label,
-    value,
-    onChange,
-    options,
-    placeholder,
-  }: {
-    label: string;
-    value: string;
-    onChange: (v: string) => void;
-    options: { id: string; name: string }[];
-    placeholder: string;
-  }) => (
-    <div>
-      <label className="block text-xs font-medium text-slate-400 mb-1">{label}</label>
-      <div className="relative">
-        <select
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 pr-8 appearance-none focus:outline-none focus:border-blue-500"
-        >
-          <option value="">{placeholder}</option>
-          {options.map((o) => (
-            <option key={o.id} value={o.id}>{o.name}</option>
-          ))}
-        </select>
-        <ChevronDown className="absolute right-2.5 top-2.5 w-4 h-4 text-slate-400 pointer-events-none" />
-      </div>
-    </div>
-  );
-
-  const EditForm = () => (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1">Name *</label>
-          <input
-            type="text"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
-          />
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1">{t('public_url')}</label>
-          <input
-            type="url"
-            value={form.publicUrl}
-            onChange={(e) => setForm({ ...form, publicUrl: e.target.value })}
-            className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
-            placeholder="https://..."
-          />
-        </div>
-        <div className="md:col-span-2">
-          <label className="block text-xs font-medium text-slate-400 mb-1">Description</label>
-          <textarea
-            value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
-            rows={2}
-            className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500 resize-none"
-          />
-        </div>
-        <SelectField label="Category" value={form.categoryId}
-          onChange={(v) => setForm({ ...form, categoryId: v })}
-          options={categories} placeholder="No category" />
-        <SelectField label="Department" value={form.departmentId}
-          onChange={(v) => setForm({ ...form, departmentId: v })}
-          options={departments} placeholder="No department" />
-        <SelectField label={t('db_connection')} value={form.dbConnectionId}
-          onChange={(v) => setForm({ ...form, dbConnectionId: v })}
-          options={dbConnections} placeholder="None (manual only)" />
-        <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1">Sort Order</label>
-          <input
-            type="number"
-            value={form.sortOrder}
-            onChange={(e) => setForm({ ...form, sortOrder: Number(e.target.value) })}
-            className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
-          />
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1">{t('available_from')}</label>
-          <input
-            type="date"
-            value={form.availableFrom}
-            onChange={(e) => setForm({ ...form, availableFrom: e.target.value })}
-            className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
-          />
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1">{t('available_until')}</label>
-          <input
-            type="date"
-            value={form.availableUntil}
-            onChange={(e) => setForm({ ...form, availableUntil: e.target.value })}
-            className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
-          />
-        </div>
-      </div>
-      <div className="flex flex-wrap gap-4">
-        {(
-          [
-            { key: 'isPublic', label: t('is_public') },
-            { key: 'isActive', label: 'Active' },
-            { key: 'requiresRenewal', label: t('requires_renewal') },
-          ] as { key: keyof FormState; label: string }[]
-        ).map(({ key, label }) => (
-          <label key={key} className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={form[key] as boolean}
-              onChange={(e) => setForm({ ...form, [key]: e.target.checked })}
-              className="w-4 h-4 accent-blue-600"
-            />
-            <span className="text-sm text-slate-300">{label}</span>
-          </label>
-        ))}
-      </div>
-      <div className="flex gap-2 justify-end">
-        <Button variant="ghost" size="sm" onClick={cancel} className="text-slate-400">
-          <X className="w-3.5 h-3.5 mr-1" /> Cancel
-        </Button>
-        <Button size="sm" onClick={handleSave} disabled={saving} className="bg-blue-600 hover:bg-blue-700">
-          <Check className="w-3.5 h-3.5 mr-1" /> Save
-        </Button>
-      </div>
-    </div>
-  );
-
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
@@ -301,7 +314,8 @@ export default function ProcessTemplatesManager({ templates: init, categories, d
       {editId === 'new' && (
         <div className="bg-slate-800/50 border border-blue-500/50 rounded-xl p-5">
           <h3 className="text-sm font-semibold text-white mb-4">{t('add_process')}</h3>
-          <EditForm />
+          <EditForm form={form} setForm={setForm} cancel={cancel} handleSave={handleSave} saving={saving}
+            categories={categories} departments={departments} dbConnections={dbConnections} tProc={t} />
         </div>
       )}
 
@@ -316,7 +330,8 @@ export default function ProcessTemplatesManager({ templates: init, categories, d
             {editId === tmpl.id ? (
               <>
                 <h3 className="text-sm font-semibold text-white mb-4">{t('edit_process')}</h3>
-                <EditForm />
+                <EditForm form={form} setForm={setForm} cancel={cancel} handleSave={handleSave} saving={saving}
+                  categories={categories} departments={departments} dbConnections={dbConnections} tProc={t} />
               </>
             ) : (
               <div className="flex items-center gap-3">

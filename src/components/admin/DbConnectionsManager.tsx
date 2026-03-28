@@ -47,6 +47,75 @@ const blank: FormState = {
   isActive: true,
 };
 
+// ── Extracted to module level to prevent remount on every render ──────────────
+interface EditFormProps {
+  form: FormState;
+  setForm: (f: FormState) => void;
+  cancel: () => void;
+  handleSave: () => void;
+  saving: boolean;
+  editId: string | 'new' | null;
+  tConn: ReturnType<typeof useTranslations>;
+}
+
+function EditForm({ form, setForm, cancel, handleSave, saving, editId, tConn }: EditFormProps) {
+  const fields: { key: keyof FormState; label: string; placeholder: string }[] = [
+    { key: 'name', label: 'Connection Name *', placeholder: 'e.g. City Hall DB' },
+    { key: 'server', label: `${tConn('server_address')} *`, placeholder: '192.168.1.100' },
+    { key: 'database', label: `${tConn('database_name')} *`, placeholder: 'LaserficheDB' },
+    { key: 'tableName', label: `${tConn('table_name')} *`, placeholder: 'ProcessRequests' },
+    { key: 'username', label: `${tConn('username')} *`, placeholder: 'sa' },
+    { key: 'port', label: tConn('port'), placeholder: '1433' },
+  ];
+
+  return (
+    <div className="space-y-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {fields.map(({ key, label, placeholder }) => (
+          <div key={key}>
+            <label className="block text-xs font-medium text-slate-400 mb-1">{label}</label>
+            <input
+              type={key === 'port' ? 'number' : 'text'}
+              value={form[key] as string}
+              onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+              placeholder={placeholder}
+              className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+            />
+          </div>
+        ))}
+        <div>
+          <label className="block text-xs font-medium text-slate-400 mb-1">
+            {tConn('password')} {editId !== 'new' ? '(leave blank to keep current)' : '*'}
+          </label>
+          <input
+            type="password"
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            placeholder="••••••••"
+            className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+          />
+        </div>
+      </div>
+      <label className="flex items-center gap-2">
+        <input
+          type="checkbox" checked={form.isActive}
+          onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
+          className="w-4 h-4 accent-blue-600"
+        />
+        <span className="text-sm text-slate-300">Active</span>
+      </label>
+      <div className="flex gap-2 justify-end">
+        <Button variant="ghost" size="sm" onClick={cancel} className="text-slate-400">
+          <X className="w-3.5 h-3.5 mr-1" /> Cancel
+        </Button>
+        <Button size="sm" onClick={handleSave} disabled={saving} className="bg-blue-600 hover:bg-blue-700">
+          <Check className="w-3.5 h-3.5 mr-1" /> Save
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export default function DbConnectionsManager({ connections: init }: Props) {
   const t = useTranslations('admin.db_connections');
   const [items, setItems] = useState(init);
@@ -144,60 +213,6 @@ export default function DbConnectionsManager({ connections: init }: Props) {
     }
   };
 
-  const EditForm = () => (
-    <div className="space-y-3">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {[
-          { key: 'name', label: 'Connection Name *', placeholder: 'e.g. City Hall DB' },
-          { key: 'server', label: `${t('server_address')} *`, placeholder: '192.168.1.100' },
-          { key: 'database', label: `${t('database_name')} *`, placeholder: 'LaserficheDB' },
-          { key: 'tableName', label: `${t('table_name')} *`, placeholder: 'ProcessRequests' },
-          { key: 'username', label: `${t('username')} *`, placeholder: 'sa' },
-          { key: 'port', label: t('port'), placeholder: '1433' },
-        ].map(({ key, label, placeholder }) => (
-          <div key={key}>
-            <label className="block text-xs font-medium text-slate-400 mb-1">{label}</label>
-            <input
-              type={key === 'port' ? 'number' : 'text'}
-              value={form[key as keyof FormState] as string}
-              onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-              placeholder={placeholder}
-              className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
-            />
-          </div>
-        ))}
-        <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1">
-            {t('password')} {editId !== 'new' ? '(leave blank to keep current)' : '*'}
-          </label>
-          <input
-            type="password"
-            value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-            placeholder="••••••••"
-            className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
-          />
-        </div>
-      </div>
-      <label className="flex items-center gap-2">
-        <input
-          type="checkbox" checked={form.isActive}
-          onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
-          className="w-4 h-4 accent-blue-600"
-        />
-        <span className="text-sm text-slate-300">Active</span>
-      </label>
-      <div className="flex gap-2 justify-end">
-        <Button variant="ghost" size="sm" onClick={cancel} className="text-slate-400">
-          <X className="w-3.5 h-3.5 mr-1" /> Cancel
-        </Button>
-        <Button size="sm" onClick={handleSave} disabled={saving} className="bg-blue-600 hover:bg-blue-700">
-          <Check className="w-3.5 h-3.5 mr-1" /> Save
-        </Button>
-      </div>
-    </div>
-  );
-
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
@@ -210,7 +225,7 @@ export default function DbConnectionsManager({ connections: init }: Props) {
       {editId === 'new' && (
         <div className="bg-slate-800/50 border border-blue-500/50 rounded-xl p-5">
           <h3 className="text-sm font-semibold text-white mb-4">{t('add_connection')}</h3>
-          <EditForm />
+          <EditForm form={form} setForm={setForm} cancel={cancel} handleSave={handleSave} saving={saving} editId={editId} tConn={t} />
         </div>
       )}
 
@@ -225,7 +240,7 @@ export default function DbConnectionsManager({ connections: init }: Props) {
             {editId === conn.id ? (
               <>
                 <h3 className="text-sm font-semibold text-white mb-4">{t('edit_connection')}</h3>
-                <EditForm />
+                <EditForm form={form} setForm={setForm} cancel={cancel} handleSave={handleSave} saving={saving} editId={editId} tConn={t} />
               </>
             ) : (
               <div className="flex items-center gap-3">
