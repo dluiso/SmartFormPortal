@@ -19,8 +19,8 @@ export default async function DownloadsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">{t('title')}</h1>
-        <p className="text-slate-400 text-sm mt-1">{t('subtitle')}</p>
+        <h1 className="text-2xl font-bold text-slate-900">{t('title')}</h1>
+        <p className="text-slate-500 text-sm mt-1">{t('subtitle')}</p>
       </div>
       <DownloadsList instances={completedProcesses} />
     </div>

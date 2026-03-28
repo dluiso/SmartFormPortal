@@ -136,10 +136,10 @@ export default function FieldMappingsManager({
   return (
     <div className="space-y-6">
       {/* Info card */}
-      <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 text-sm text-slate-400">
+      <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm text-slate-600">
         <p>
-          Map each <span className="text-white font-medium">portal field</span> to the
-          corresponding <span className="text-white font-medium">column name</span> in your
+          Map each <span className="text-slate-900 font-medium">portal field</span> to the
+          corresponding <span className="text-slate-900 font-medium">column name</span> in your
           Laserfiche MSSQL table. The sync engine uses these mappings to update this process&apos;s
           status and data automatically.
         </p>
@@ -155,8 +155,8 @@ export default function FieldMappingsManager({
       </div>
 
       {/* Mappings table */}
-      <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl overflow-hidden">
-        <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-0 text-xs text-slate-500 font-medium uppercase tracking-wider px-4 py-2.5 border-b border-slate-700/50">
+      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+        <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-0 text-xs text-slate-500 font-medium uppercase tracking-wider px-4 py-2.5 border-b border-slate-200">
           <span>Portal Field</span>
           <span>MSSQL Column</span>
           <span>DB Connection</span>
@@ -168,7 +168,7 @@ export default function FieldMappingsManager({
             No mappings configured. Add one below.
           </div>
         ) : (
-          <div className="divide-y divide-slate-700/30">
+          <div className="divide-y divide-slate-200">
             {rows.map((row, idx) => (
               <div
                 key={idx}
@@ -181,7 +181,7 @@ export default function FieldMappingsManager({
                     onChange={(e) =>
                       updateRow(idx, { portalField: e.target.value as PortalField })
                     }
-                    className="w-full bg-slate-900 border border-slate-700 rounded-md px-2 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500"
+                    className="w-full bg-white border border-slate-300 rounded-md px-2 py-1.5 text-sm text-slate-900 focus:outline-none focus:border-blue-500"
                   >
                     {availableForRow(row.portalField).map((f) => (
                       <option key={f} value={f}>
@@ -201,7 +201,7 @@ export default function FieldMappingsManager({
                   value={row.externalColumn}
                   onChange={(e) => updateRow(idx, { externalColumn: e.target.value })}
                   placeholder="e.g. ProcessStatus"
-                  className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-600 focus:border-blue-500 h-8 text-sm"
+                  className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500 h-8 text-sm"
                 />
 
                 {/* DB connection */}
@@ -238,7 +238,7 @@ export default function FieldMappingsManager({
           size="sm"
           onClick={addRow}
           disabled={usedFields.size >= PORTAL_FIELDS.length}
-          className="border-slate-700 text-slate-300 hover:bg-slate-800"
+          className="border-slate-300 text-slate-600 hover:bg-slate-100"
         >
           <Plus className="w-3.5 h-3.5 mr-1.5" />
           Add Mapping

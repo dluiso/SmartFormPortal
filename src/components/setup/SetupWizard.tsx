@@ -103,8 +103,8 @@ export default function SetupWizard() {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-4">
             <Building2 className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-white">SmartFormPortal</h1>
-          <p className="text-slate-400 text-sm mt-1">Initial Setup</p>
+          <h1 className="text-2xl font-bold text-slate-900">SmartFormPortal</h1>
+          <p className="text-slate-500 text-sm mt-1">Initial Setup</p>
         </div>
 
         {/* Step Indicator */}
@@ -118,7 +118,7 @@ export default function SetupWizard() {
                       ? 'bg-blue-600 text-white'
                       : idx === step
                       ? 'bg-blue-600 text-white ring-4 ring-blue-600/30'
-                      : 'bg-slate-700 text-slate-400'
+                      : 'bg-slate-200 text-slate-500'
                   }`}
                 >
                   {idx < step ? (
@@ -130,7 +130,7 @@ export default function SetupWizard() {
                 {idx < 3 && (
                   <div
                     className={`w-16 h-0.5 mx-1 transition-all duration-300 ${
-                      idx < step ? 'bg-blue-600' : 'bg-slate-700'
+                      idx < step ? 'bg-blue-600' : 'bg-slate-200'
                     }`}
                   />
                 )}
@@ -140,7 +140,7 @@ export default function SetupWizard() {
         )}
 
         {/* Card */}
-        <div className="bg-slate-800/80 backdrop-blur border border-slate-700 rounded-2xl overflow-hidden shadow-2xl">
+        <div className="bg-white backdrop-blur border border-slate-200 rounded-2xl overflow-hidden shadow-2xl">
           <AnimatePresence mode="wait">
             <motion.div
               key={step}

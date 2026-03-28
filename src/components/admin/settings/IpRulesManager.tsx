@@ -59,8 +59,8 @@ export default function IpRulesManager({ initial }: Props) {
   return (
     <div className="space-y-5">
       {/* Add form */}
-      <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 space-y-4">
-        <h3 className="text-sm font-semibold text-white">Add IP Rule</h3>
+      <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4">
+        <h3 className="text-sm font-semibold text-slate-900">Add IP Rule</h3>
         <p className="text-xs text-slate-500">Supports single IPs (192.168.1.1) or CIDR ranges (10.0.0.0/8).</p>
 
         <div className="flex gap-2">
@@ -70,7 +70,7 @@ export default function IpRulesManager({ initial }: Props) {
                 type === t ? (t === 'blacklist'
                   ? 'border-red-700/50 bg-red-900/20 text-red-400'
                   : 'border-green-700/50 bg-green-900/20 text-green-400')
-                : 'border-slate-700 text-slate-500 hover:border-slate-600'
+                : 'border-slate-200 text-slate-500 hover:border-slate-300'
               }`}>
               {t === 'blacklist' ? <><ShieldOff className="w-3 h-3 inline mr-1" />Blacklist</> : <><ShieldCheck className="w-3 h-3 inline mr-1" />Whitelist</>}
             </button>
@@ -79,10 +79,10 @@ export default function IpRulesManager({ initial }: Props) {
 
         <div className="grid grid-cols-2 gap-3">
           <Input value={ip} onChange={(e) => setIp(e.target.value)} placeholder="IP or CIDR"
-            className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-600 focus:border-blue-500 font-mono"
+            className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500 font-mono"
             onKeyDown={(e) => e.key === 'Enter' && handleAdd()} />
           <Input value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="Description (optional)"
-            className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-600 focus:border-blue-500" />
+            className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500" />
         </div>
 
         <Button onClick={handleAdd} disabled={adding || !ip.trim()} size="sm">
@@ -96,15 +96,15 @@ export default function IpRulesManager({ initial }: Props) {
         { label: 'Blacklisted IPs', items: blacklisted, color: 'text-red-400', bg: 'bg-red-900/20' },
         { label: 'Whitelisted IPs', items: whitelisted, color: 'text-green-400', bg: 'bg-green-900/20' },
       ].map(({ label, items, color, bg }) => (
-        <div key={label} className="bg-slate-800/50 border border-slate-700/50 rounded-xl overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700/50">
-            <span className="text-sm font-semibold text-white">{label}</span>
-            <Badge className="bg-slate-700 text-slate-400 border-0">{items.length}</Badge>
+        <div key={label} className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200">
+            <span className="text-sm font-semibold text-slate-900">{label}</span>
+            <Badge className="bg-slate-100 text-slate-500 border-0">{items.length}</Badge>
           </div>
           {items.length === 0 ? (
             <p className="px-4 py-6 text-center text-slate-600 text-sm">None configured</p>
           ) : (
-            <div className="divide-y divide-slate-700/30">
+            <div className="divide-y divide-slate-200">
               {items.map((r) => (
                 <div key={r.id} className="flex items-center justify-between px-4 py-2.5">
                   <div className="flex items-center gap-3">

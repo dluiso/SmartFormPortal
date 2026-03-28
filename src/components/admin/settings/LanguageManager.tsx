@@ -102,28 +102,28 @@ export default function LanguageManager({ languages: initialLanguages }: Props) 
   return (
     <div className="space-y-6 max-w-2xl">
       {/* Existing languages */}
-      <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl overflow-hidden">
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-700/50">
+      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+        <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-200">
           <Languages className="w-4 h-4 text-slate-500" />
-          <span className="text-sm font-semibold text-white">Available Languages</span>
+          <span className="text-sm font-semibold text-slate-900">Available Languages</span>
         </div>
 
-        <div className="divide-y divide-slate-700/30">
+        <div className="divide-y divide-slate-200">
           {allEntries.map((lang) => (
             <div key={lang.id}>
               <div className="flex items-center justify-between px-4 py-3">
                 <div className="flex items-center gap-3">
-                  <span className="text-sm font-mono text-white bg-slate-700 px-2 py-0.5 rounded uppercase">
+                  <span className="text-sm font-mono text-slate-900 bg-slate-100 px-2 py-0.5 rounded uppercase">
                     {lang.code}
                   </span>
                   <div>
-                    <span className="text-sm text-white">{lang.name}</span>
+                    <span className="text-sm text-slate-900">{lang.name}</span>
                     <div className="flex items-center gap-2 mt-0.5">
                       {lang.isDefault && (
                         <Badge className="text-xs bg-blue-900/30 text-blue-400 border-blue-700/30">Default</Badge>
                       )}
                       {lang.isBuiltIn && (
-                        <Badge className="text-xs bg-slate-700 text-slate-400 border-0">Built-in</Badge>
+                        <Badge className="text-xs bg-slate-100 text-slate-500 border-0">Built-in</Badge>
                       )}
                       {lang.isComplete ? (
                         <span className="flex items-center gap-1 text-xs text-green-400">
@@ -152,7 +152,7 @@ export default function LanguageManager({ languages: initialLanguages }: Props) 
                     variant="ghost"
                     size="sm"
                     onClick={() => handleExport(lang.code)}
-                    className="h-7 px-2 text-slate-400 hover:text-white hover:bg-slate-700"
+                    className="h-7 px-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100"
                     title="Export as JSON"
                   >
                     <Download className="w-3.5 h-3.5" />
@@ -163,7 +163,7 @@ export default function LanguageManager({ languages: initialLanguages }: Props) 
               {/* Missing keys list */}
               {expandedMissing === lang.id && lang.missingKeys.length > 0 && (
                 <div className="px-4 pb-3 ml-12">
-                  <div className="bg-slate-900 rounded-lg p-3 max-h-40 overflow-y-auto">
+                  <div className="bg-slate-50 rounded-lg p-3 max-h-40 overflow-y-auto">
                     {lang.missingKeys.map((key) => (
                       <p key={key} className="text-xs font-mono text-amber-400/80">{key}</p>
                     ))}
@@ -176,10 +176,10 @@ export default function LanguageManager({ languages: initialLanguages }: Props) 
       </div>
 
       {/* Import */}
-      <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 space-y-4">
-        <h2 className="text-sm font-semibold text-white">Import Language File</h2>
+      <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4">
+        <h2 className="text-sm font-semibold text-slate-900">Import Language File</h2>
         <p className="text-xs text-slate-500">
-          Export <strong className="text-slate-300">en</strong> as a template, translate the
+          Export <strong className="text-slate-600">en</strong> as a template, translate the
           values, then import it here. Missing keys fall back to English.
         </p>
 
@@ -190,7 +190,7 @@ export default function LanguageManager({ languages: initialLanguages }: Props) 
               value={importCode}
               onChange={(e) => setImportCode(e.target.value)}
               placeholder="fr"
-              className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-600 focus:border-blue-500 font-mono"
+              className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500 font-mono"
               maxLength={5}
             />
           </div>
@@ -200,7 +200,7 @@ export default function LanguageManager({ languages: initialLanguages }: Props) 
               value={importName}
               onChange={(e) => setImportName(e.target.value)}
               placeholder="Français"
-              className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-600 focus:border-blue-500"
+              className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
             />
           </div>
         </div>
@@ -212,7 +212,7 @@ export default function LanguageManager({ languages: initialLanguages }: Props) 
             type="file"
             accept=".json,application/json"
             onChange={(e) => setSelectedFile(e.target.files?.[0] ?? null)}
-            className="block w-full text-sm text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-slate-700 file:text-slate-300 hover:file:bg-slate-600 cursor-pointer"
+            className="block w-full text-sm text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 cursor-pointer"
           />
         </div>
 

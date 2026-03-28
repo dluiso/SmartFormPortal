@@ -133,7 +133,7 @@ export default function RegisterForm() {
     colSpan = 'col-span-2'
   ) => (
     <div className={colSpan}>
-      <Label className="text-slate-300 mb-1.5 block">
+      <Label className="text-slate-700 mb-1.5 block">
         {label} <span className="text-red-400">*</span>
       </Label>
       <Input
@@ -141,7 +141,7 @@ export default function RegisterForm() {
         value={form[id] as string}
         onChange={(e) => update(id, e.target.value)}
         placeholder={placeholder}
-        className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 focus:border-blue-500"
+        className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
       />
       {errors[id] && <p className="text-red-400 text-xs mt-1">{errors[id]}</p>}
     </div>
@@ -154,12 +154,12 @@ export default function RegisterForm() {
         <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-600 rounded-xl mb-3">
           <Building2 className="w-6 h-6 text-white" />
         </div>
-        <h1 className="text-lg font-bold text-white">SmartFormPortal</h1>
+        <h1 className="text-lg font-bold text-slate-900">SmartFormPortal</h1>
       </div>
 
-      <div className="bg-slate-800/80 backdrop-blur border border-slate-700 rounded-2xl p-8 shadow-2xl">
-        <h2 className="text-xl font-bold text-white mb-1">{t('title')}</h2>
-        <p className="text-slate-400 text-sm mb-6">{t('subtitle')}</p>
+      <div className="bg-white backdrop-blur border border-slate-200 rounded-2xl p-8 shadow-2xl">
+        <h2 className="text-xl font-bold text-slate-900 mb-1">{t('title')}</h2>
+        <p className="text-slate-500 text-sm mb-6">{t('subtitle')}</p>
 
         <form onSubmit={handleSubmit} noValidate>
           <div className="grid grid-cols-2 gap-4 mb-4">
@@ -171,7 +171,7 @@ export default function RegisterForm() {
 
             {/* User Type */}
             <div className="col-span-2">
-              <Label className="text-slate-300 mb-2 block">
+              <Label className="text-slate-700 mb-2 block">
                 {t('user_type')} <span className="text-red-400">*</span>
               </Label>
               <RadioGroup
@@ -181,13 +181,13 @@ export default function RegisterForm() {
               >
                 <div className="flex items-center gap-2">
                   <RadioGroupItem value="RESIDENT" id="resident" />
-                  <Label htmlFor="resident" className="text-slate-300 cursor-pointer">
+                  <Label htmlFor="resident" className="text-slate-700 cursor-pointer">
                     {t('resident')}
                   </Label>
                 </div>
                 <div className="flex items-center gap-2">
                   <RadioGroupItem value="BUSINESS_OWNER" id="business" />
-                  <Label htmlFor="business" className="text-slate-300 cursor-pointer">
+                  <Label htmlFor="business" className="text-slate-700 cursor-pointer">
                     {t('business_owner')}
                   </Label>
                 </div>
@@ -203,7 +203,7 @@ export default function RegisterForm() {
 
             {/* Password */}
             <div className="col-span-1">
-              <Label className="text-slate-300 mb-1.5 block">
+              <Label className="text-slate-700 mb-1.5 block">
                 {t('password')} <span className="text-red-400">*</span>
               </Label>
               <div className="relative">
@@ -212,7 +212,7 @@ export default function RegisterForm() {
                   value={form.password}
                   onChange={(e) => update('password', e.target.value)}
                   autoComplete="new-password"
-                  className="bg-slate-700 border-slate-600 text-white focus:border-blue-500 pr-10"
+                  className="bg-white border-slate-300 text-slate-900 focus:border-blue-500 pr-10"
                 />
                 <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
                   {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -222,7 +222,7 @@ export default function RegisterForm() {
             </div>
 
             <div className="col-span-1">
-              <Label className="text-slate-300 mb-1.5 block">
+              <Label className="text-slate-700 mb-1.5 block">
                 {t('confirm_password')} <span className="text-red-400">*</span>
               </Label>
               <div className="relative">
@@ -231,7 +231,7 @@ export default function RegisterForm() {
                   value={form.confirmPassword}
                   onChange={(e) => update('confirmPassword', e.target.value)}
                   autoComplete="new-password"
-                  className="bg-slate-700 border-slate-600 text-white focus:border-blue-500 pr-10"
+                  className="bg-white border-slate-300 text-slate-900 focus:border-blue-500 pr-10"
                 />
                 <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
                   {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -253,7 +253,7 @@ export default function RegisterForm() {
           </Button>
         </form>
 
-        <p className="text-center text-sm text-slate-400 mt-4">
+        <p className="text-center text-sm text-slate-500 mt-4">
           {t('already_account')}{' '}
           <Link href="/login" className="text-blue-400 hover:text-blue-300 font-medium">
             {t('login_link')}

@@ -83,8 +83,8 @@ export default async function StatisticsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">{t('title')}</h1>
-        <p className="text-slate-400 text-sm mt-1">{t('my_statistics')}</p>
+        <h1 className="text-2xl font-bold text-slate-900">{t('title')}</h1>
+        <p className="text-slate-500 text-sm mt-1">{t('my_statistics')}</p>
       </div>
       <StatisticsView
         counts={counts}

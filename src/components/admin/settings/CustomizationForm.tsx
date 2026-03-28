@@ -77,28 +77,28 @@ export default function CustomizationForm({ initial }: Props) {
     <div className="space-y-6 max-w-2xl">
 
       {/* Identity */}
-      <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 space-y-4">
+      <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4">
         <div className="flex items-center gap-2 mb-1">
           <Type className="w-4 h-4 text-slate-500" />
-          <h2 className="text-sm font-semibold text-white">Portal Identity</h2>
+          <h2 className="text-sm font-semibold text-slate-900">Portal Identity</h2>
         </div>
         <div>
           <label className="block text-xs text-slate-500 mb-1">Portal Name</label>
           <Input value={form.portalName} onChange={(e) => set('portalName', e.target.value)}
-            className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-600 focus:border-blue-500" />
+            className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500" />
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs text-slate-500 mb-1">Logo URL</label>
             <Input value={form.logoUrl} onChange={(e) => set('logoUrl', e.target.value)}
               placeholder="https://..."
-              className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-600 focus:border-blue-500" />
+              className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500" />
           </div>
           <div>
             <label className="block text-xs text-slate-500 mb-1">Favicon URL</label>
             <Input value={form.faviconUrl} onChange={(e) => set('faviconUrl', e.target.value)}
               placeholder="https://..."
-              className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-600 focus:border-blue-500" />
+              className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500" />
           </div>
         </div>
         {form.logoUrl && (
@@ -110,10 +110,10 @@ export default function CustomizationForm({ initial }: Props) {
       </div>
 
       {/* Login background */}
-      <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 space-y-4">
+      <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4">
         <div className="flex items-center gap-2 mb-1">
           <Image className="w-4 h-4 text-slate-500" />
-          <h2 className="text-sm font-semibold text-white">Login Page Background</h2>
+          <h2 className="text-sm font-semibold text-slate-900">Login Page Background</h2>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
@@ -124,23 +124,23 @@ export default function CustomizationForm({ initial }: Props) {
                 className="w-8 h-8 rounded cursor-pointer border-0 bg-transparent" />
               <Input value={form.loginBgColor} onChange={(e) => set('loginBgColor', e.target.value)}
                 placeholder="#0f172a"
-                className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-600 focus:border-blue-500 font-mono" />
+                className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500 font-mono" />
             </div>
           </div>
           <div>
             <label className="block text-xs text-slate-500 mb-1">Background Image URL</label>
             <Input value={form.loginBgImageUrl} onChange={(e) => set('loginBgImageUrl', e.target.value)}
               placeholder="https://..."
-              className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-600 focus:border-blue-500" />
+              className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500" />
           </div>
         </div>
       </div>
 
       {/* Colors */}
-      <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 space-y-4">
+      <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4">
         <div className="flex items-center gap-2 mb-1">
           <Palette className="w-4 h-4 text-slate-500" />
-          <h2 className="text-sm font-semibold text-white">Color Scheme</h2>
+          <h2 className="text-sm font-semibold text-slate-900">Color Scheme</h2>
         </div>
 
         {/* Presets */}
@@ -148,7 +148,7 @@ export default function CustomizationForm({ initial }: Props) {
           <span className="text-xs text-slate-500">Presets:</span>
           {Object.keys(COLOR_PRESETS).map((k) => (
             <button key={k} onClick={() => applyPreset(k as keyof typeof COLOR_PRESETS)}
-              className="w-6 h-6 rounded-full border-2 border-slate-600 hover:border-slate-400 transition-all"
+              className="w-6 h-6 rounded-full border-2 border-slate-300 hover:border-slate-500 transition-all"
               style={{ backgroundColor: COLOR_PRESETS[k as keyof typeof COLOR_PRESETS].primaryColor }}
               title={k} />
           ))}
@@ -167,7 +167,7 @@ export default function CustomizationForm({ initial }: Props) {
                   onChange={(e) => set(key, e.target.value)}
                   className="w-8 h-8 rounded cursor-pointer border-0 bg-transparent" />
                 <Input value={form[key]} onChange={(e) => set(key, e.target.value)}
-                  className="bg-slate-900 border-slate-700 text-white focus:border-blue-500 font-mono text-sm" />
+                  className="bg-white border-slate-300 text-slate-900 focus:border-blue-500 font-mono text-sm" />
               </div>
             </div>
           ))}
@@ -185,15 +185,15 @@ export default function CustomizationForm({ initial }: Props) {
       </div>
 
       {/* Custom CSS */}
-      <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 space-y-3">
-        <h2 className="text-sm font-semibold text-white">Custom CSS</h2>
+      <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-3">
+        <h2 className="text-sm font-semibold text-slate-900">Custom CSS</h2>
         <p className="text-xs text-slate-500">Injected into every portal page. Use with caution.</p>
         <textarea
           value={form.customCss}
           onChange={(e) => set('customCss', e.target.value)}
           rows={8}
           placeholder=":root { --primary: #3b82f6; }"
-          className="w-full bg-slate-900 border border-slate-700 rounded-md px-3 py-2 text-sm text-slate-300 placeholder:text-slate-600 focus:outline-none focus:border-blue-500 font-mono resize-y"
+          className="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 font-mono resize-y"
         />
       </div>
 

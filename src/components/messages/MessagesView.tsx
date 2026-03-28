@@ -124,10 +124,10 @@ export default function MessagesView({ inbox, sent, departments, instances }: Pr
           {t('staff_contact')}
         </Button>
 
-        <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl overflow-hidden">
+        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
           <button
             onClick={() => setTab('inbox')}
-            className={`w-full flex items-center gap-2.5 px-4 py-3 text-sm transition-colors ${tab === 'inbox' ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-700/50'}`}
+            className={`w-full flex items-center gap-2.5 px-4 py-3 text-sm transition-colors ${tab === 'inbox' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
           >
             <Inbox className="w-4 h-4" />
             {t('inbox')}
@@ -137,7 +137,7 @@ export default function MessagesView({ inbox, sent, departments, instances }: Pr
           </button>
           <button
             onClick={() => setTab('sent')}
-            className={`w-full flex items-center gap-2.5 px-4 py-3 text-sm transition-colors ${tab === 'sent' ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-700/50'}`}
+            className={`w-full flex items-center gap-2.5 px-4 py-3 text-sm transition-colors ${tab === 'sent' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
           >
             <Send className="w-4 h-4" />
             {t('sent')}
@@ -154,11 +154,11 @@ export default function MessagesView({ inbox, sent, departments, instances }: Pr
                 <button
                   key={item.id}
                   onClick={() => handleSelect(item)}
-                  className={`w-full text-left px-3 py-2.5 rounded-lg transition-colors ${selected && 'id' in selected && selected.id === item.id ? 'bg-slate-700' : 'hover:bg-slate-800'}`}
+                  className={`w-full text-left px-3 py-2.5 rounded-lg transition-colors ${selected && 'id' in selected && selected.id === item.id ? 'bg-slate-100' : 'hover:bg-slate-50'}`}
                 >
                   <div className="flex items-center gap-2">
                     {!item.isRead && <div className="w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0" />}
-                    <p className={`text-sm truncate ${!item.isRead ? 'font-semibold text-white' : 'text-slate-300'}`}>
+                    <p className={`text-sm truncate ${!item.isRead ? 'font-semibold text-slate-900' : 'text-slate-600'}`}>
                       {item.subject}
                     </p>
                   </div>
@@ -174,9 +174,9 @@ export default function MessagesView({ inbox, sent, departments, instances }: Pr
                 <button
                   key={item.id}
                   onClick={() => handleSelect(item)}
-                  className={`w-full text-left px-3 py-2.5 rounded-lg transition-colors ${selected && 'id' in selected && selected.id === item.id ? 'bg-slate-700' : 'hover:bg-slate-800'}`}
+                  className={`w-full text-left px-3 py-2.5 rounded-lg transition-colors ${selected && 'id' in selected && selected.id === item.id ? 'bg-slate-100' : 'hover:bg-slate-50'}`}
                 >
-                  <p className="text-sm truncate text-slate-300">{item.subject}</p>
+                  <p className="text-sm truncate text-slate-600">{item.subject}</p>
                   <p className="text-xs text-slate-500 mt-0.5">
                     {new Date(item.createdAt).toLocaleDateString()}
                   </p>
@@ -188,24 +188,24 @@ export default function MessagesView({ inbox, sent, departments, instances }: Pr
       </div>
 
       {/* Main panel */}
-      <div className="flex-1 bg-slate-800/50 border border-slate-700/50 rounded-xl overflow-hidden flex flex-col">
+      <div className="flex-1 bg-white border border-slate-200 rounded-xl overflow-hidden flex flex-col">
         {composing ? (
           /* Compose form */
           <div className="flex flex-col h-full">
-            <div className="flex items-center justify-between px-5 py-3 border-b border-slate-700">
-              <h2 className="text-sm font-semibold text-white">{t('staff_contact')}</h2>
-              <button onClick={() => setComposing(false)} className="text-slate-400 hover:text-white">
+            <div className="flex items-center justify-between px-5 py-3 border-b border-slate-200">
+              <h2 className="text-sm font-semibold text-slate-900">{t('staff_contact')}</h2>
+              <button onClick={() => setComposing(false)} className="text-slate-400 hover:text-slate-700">
                 <X className="w-4 h-4" />
               </button>
             </div>
             <form onSubmit={handleSend} className="flex flex-col flex-1 p-5 gap-4">
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1.5">{t('select_recipient')} *</label>
+                <label className="block text-xs font-medium text-slate-600 mb-1.5">{t('select_recipient')} *</label>
                 <div className="relative">
                   <select
                     value={composeData.departmentId}
                     onChange={(e) => setComposeData((d) => ({ ...d, departmentId: e.target.value }))}
-                    className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 pr-8 appearance-none focus:outline-none focus:border-blue-500"
+                    className="w-full bg-white border border-slate-300 text-slate-900 text-sm rounded-lg px-3 py-2 pr-8 appearance-none focus:outline-none focus:border-blue-500"
                     required
                   >
                     <option value="">Select a department...</option>
@@ -219,12 +219,12 @@ export default function MessagesView({ inbox, sent, departments, instances }: Pr
 
               {instances.length > 0 && (
                 <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1.5">{t('select_process')}</label>
+                  <label className="block text-xs font-medium text-slate-600 mb-1.5">{t('select_process')}</label>
                   <div className="relative">
                     <select
                       value={composeData.processInstanceId}
                       onChange={(e) => setComposeData((d) => ({ ...d, processInstanceId: e.target.value }))}
-                      className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 pr-8 appearance-none focus:outline-none focus:border-blue-500"
+                      className="w-full bg-white border border-slate-300 text-slate-900 text-sm rounded-lg px-3 py-2 pr-8 appearance-none focus:outline-none focus:border-blue-500"
                     >
                       <option value="">None</option>
                       {instances.map((inst) => (
@@ -239,31 +239,31 @@ export default function MessagesView({ inbox, sent, departments, instances }: Pr
               )}
 
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1.5">{t('subject')} *</label>
+                <label className="block text-xs font-medium text-slate-600 mb-1.5">{t('subject')} *</label>
                 <input
                   type="text"
                   value={composeData.subject}
                   onChange={(e) => setComposeData((d) => ({ ...d, subject: e.target.value }))}
                   placeholder={t('subject_placeholder')}
-                  className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500 placeholder:text-slate-500"
+                  className="w-full bg-white border border-slate-300 text-slate-900 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500 placeholder:text-slate-400"
                   required
                 />
               </div>
 
               <div className="flex-1">
-                <label className="block text-xs font-medium text-slate-400 mb-1.5">{t('body')} *</label>
+                <label className="block text-xs font-medium text-slate-600 mb-1.5">{t('body')} *</label>
                 <textarea
                   value={composeData.body}
                   onChange={(e) => setComposeData((d) => ({ ...d, body: e.target.value }))}
                   placeholder={t('body_placeholder')}
-                  className="w-full h-full min-h-[120px] bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500 placeholder:text-slate-500 resize-none"
+                  className="w-full h-full min-h-[120px] bg-white border border-slate-300 text-slate-900 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500 placeholder:text-slate-400 resize-none"
                   required
                 />
               </div>
 
               <div className="flex justify-end gap-2">
                 <Button type="button" variant="outline" onClick={() => setComposing(false)}
-                  className="border-slate-600 text-slate-300 hover:bg-slate-700">
+                  className="border-slate-300 text-slate-600 hover:bg-slate-100">
                   Cancel
                 </Button>
                 <Button type="submit" disabled={sending} className="bg-blue-600 hover:bg-blue-700">
@@ -276,8 +276,8 @@ export default function MessagesView({ inbox, sent, departments, instances }: Pr
         ) : selected ? (
           /* Message detail */
           <div className="flex flex-col h-full">
-            <div className="px-5 py-4 border-b border-slate-700">
-              <h2 className="font-semibold text-white">{selected.subject}</h2>
+            <div className="px-5 py-4 border-b border-slate-200">
+              <h2 className="font-semibold text-slate-900">{selected.subject}</h2>
               <p className="text-xs text-slate-500 mt-0.5">
                 {new Date(selected.createdAt).toLocaleString()}
                 {tab === 'inbox' && 'sender' in selected && selected.sender
@@ -286,13 +286,13 @@ export default function MessagesView({ inbox, sent, departments, instances }: Pr
               </p>
             </div>
             <div className="flex-1 overflow-y-auto p-5">
-              <p className="text-slate-300 text-sm whitespace-pre-wrap">{selected.body}</p>
+              <p className="text-slate-600 text-sm whitespace-pre-wrap">{selected.body}</p>
             </div>
           </div>
         ) : (
           /* Empty state */
           <div className="flex flex-col items-center justify-center h-full text-center">
-            <Inbox className="w-12 h-12 text-slate-600 mb-3" />
+            <Inbox className="w-12 h-12 text-slate-400 mb-3" />
             <p className="text-slate-500 text-sm">Select a message to read</p>
           </div>
         )}

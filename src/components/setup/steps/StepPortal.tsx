@@ -31,21 +31,21 @@ export default function StepPortal({ data, onChange, onNext, onBack }: Props) {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-white mb-2">Portal Configuration</h2>
-      <p className="text-slate-400 text-sm mb-6">
+      <h2 className="text-2xl font-bold text-slate-900 mb-2">Portal Configuration</h2>
+      <p className="text-slate-500 text-sm mb-6">
         Set the name and domain for your portal. These can be changed later in settings.
       </p>
 
       <div className="space-y-4 mb-8">
         <div>
-          <Label className="text-slate-300 mb-1.5 block">
+          <Label className="text-slate-700 mb-1.5 block">
             Portal Name <span className="text-red-400">*</span>
           </Label>
           <Input
             value={data.portalName}
             onChange={(e) => onChange({ portalName: e.target.value })}
             placeholder="e.g. City Hall Portal, Municipal Services"
-            className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 focus:border-blue-500"
+            className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
           />
           {errors.portalName && (
             <p className="text-red-400 text-xs mt-1">{errors.portalName}</p>
@@ -56,14 +56,14 @@ export default function StepPortal({ data, onChange, onNext, onBack }: Props) {
         </div>
 
         <div>
-          <Label className="text-slate-300 mb-1.5 block">
+          <Label className="text-slate-700 mb-1.5 block">
             Domain <span className="text-slate-500 font-normal">(optional)</span>
           </Label>
           <Input
             value={data.domain}
             onChange={(e) => onChange({ domain: e.target.value })}
             placeholder="portal.yourdomain.com"
-            className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 focus:border-blue-500"
+            className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
           />
           <p className="text-slate-500 text-xs mt-1">
             Used for license validation and email links.
@@ -75,7 +75,7 @@ export default function StepPortal({ data, onChange, onNext, onBack }: Props) {
         <Button
           variant="outline"
           onClick={onBack}
-          className="flex-1 border-slate-600 text-slate-300 hover:bg-slate-700"
+          className="flex-1 border-slate-300 text-slate-600 hover:bg-slate-100"
         >
           Back
         </Button>

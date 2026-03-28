@@ -17,10 +17,10 @@ const features = [
 export default function StepWelcome({ onNext }: Props) {
   return (
     <div className="text-center">
-      <h2 className="text-2xl font-bold text-white mb-2">
+      <h2 className="text-2xl font-bold text-slate-900 mb-2">
         Welcome to SmartFormPortal
       </h2>
-      <p className="text-slate-400 mb-8 max-w-md mx-auto">
+      <p className="text-slate-500 mb-8 max-w-md mx-auto">
         This wizard will guide you through the initial configuration. This setup page will be
         disabled once installation is complete.
       </p>
@@ -29,12 +29,12 @@ export default function StepWelcome({ onNext }: Props) {
         {features.map((f, i) => (
           <div
             key={i}
-            className="flex items-center gap-3 bg-slate-700/50 rounded-xl p-3"
+            className="flex items-center gap-3 bg-slate-50 rounded-xl p-3"
           >
             <div className="flex-shrink-0 w-8 h-8 bg-blue-600/20 rounded-lg flex items-center justify-center">
               <f.icon className="w-4 h-4 text-blue-400" />
             </div>
-            <span className="text-sm text-slate-300">{f.text}</span>
+            <span className="text-sm text-slate-600">{f.text}</span>
           </div>
         ))}
       </div>

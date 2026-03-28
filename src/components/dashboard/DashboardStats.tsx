@@ -23,33 +23,33 @@ export default function DashboardStats({ stats }: Props) {
       label: t('total_processes'),
       value: stats.total,
       icon: FileText,
-      color: 'text-blue-400',
-      bg: 'bg-blue-600/10',
-      border: 'border-blue-600/20',
+      color: 'text-blue-600',
+      bg: 'bg-blue-50',
+      border: 'border-blue-200',
     },
     {
       label: t('in_progress'),
       value: stats.inProgress,
       icon: Clock,
-      color: 'text-amber-400',
-      bg: 'bg-amber-600/10',
-      border: 'border-amber-600/20',
+      color: 'text-amber-600',
+      bg: 'bg-amber-50',
+      border: 'border-amber-200',
     },
     {
       label: t('completed'),
       value: stats.completed,
       icon: CheckCircle2,
-      color: 'text-green-400',
-      bg: 'bg-green-600/10',
-      border: 'border-green-600/20',
+      color: 'text-green-600',
+      bg: 'bg-green-50',
+      border: 'border-green-200',
     },
     {
       label: t('pending'),
       value: stats.pending,
       icon: AlertCircle,
-      color: 'text-orange-400',
-      bg: 'bg-orange-600/10',
-      border: 'border-orange-600/20',
+      color: 'text-orange-600',
+      bg: 'bg-orange-50',
+      border: 'border-orange-200',
     },
     ...(stats.nearRenewal > 0
       ? [
@@ -57,9 +57,9 @@ export default function DashboardStats({ stats }: Props) {
             label: t('near_renewal'),
             value: stats.nearRenewal,
             icon: RotateCcw,
-            color: 'text-purple-400',
-            bg: 'bg-purple-600/10',
-            border: 'border-purple-600/20',
+            color: 'text-purple-600',
+            bg: 'bg-purple-50',
+            border: 'border-purple-200',
           },
         ]
       : []),
@@ -73,7 +73,7 @@ export default function DashboardStats({ stats }: Props) {
           className={`rounded-xl border ${card.border} ${card.bg} p-4`}
         >
           <div className="flex items-center justify-between mb-2">
-            <p className="text-sm text-slate-400">{card.label}</p>
+            <p className="text-sm text-slate-500">{card.label}</p>
             <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${card.bg}`}>
               <card.icon className={`w-4 h-4 ${card.color}`} />
             </div>

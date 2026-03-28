@@ -57,30 +57,30 @@ export default async function AdminStatisticsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-white">{t('title')}</h1>
+      <h1 className="text-2xl font-bold text-slate-900">{t('title')}</h1>
 
       {/* Status breakdown */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {statusCounts.map((g) => (
-          <div key={g.status} className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
-            <p className="text-2xl font-bold text-white">{g._count.status}</p>
-            <p className="text-slate-400 text-sm mt-0.5 capitalize">{g.status.replace(/_/g, ' ').toLowerCase()}</p>
+          <div key={g.status} className="bg-white border border-slate-200 rounded-xl p-4">
+            <p className="text-2xl font-bold text-slate-900">{g._count.status}</p>
+            <p className="text-slate-500 text-sm mt-0.5 capitalize">{g.status.replace(/_/g, ' ').toLowerCase()}</p>
           </div>
         ))}
-        <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
-          <p className="text-2xl font-bold text-white">{total}</p>
-          <p className="text-slate-400 text-sm mt-0.5">{t('total_requests')}</p>
+        <div className="bg-white border border-slate-200 rounded-xl p-4">
+          <p className="text-2xl font-bold text-slate-900">{total}</p>
+          <p className="text-slate-500 text-sm mt-0.5">{t('total_requests')}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Monthly chart */}
-        <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5">
-          <p className="text-sm font-semibold text-white mb-5">Applications per Month</p>
+        <div className="bg-white border border-slate-200 rounded-xl p-5">
+          <p className="text-sm font-semibold text-slate-900 mb-5">Applications per Month</p>
           <div className="flex items-end gap-2 h-32">
             {monthly.map((m) => (
               <div key={m.label} className="flex-1 flex flex-col items-center gap-1.5">
-                <span className="text-xs text-slate-400">{m.count || ''}</span>
+                <span className="text-xs text-slate-500">{m.count || ''}</span>
                 <div
                   className="w-full bg-blue-600/70 rounded-t"
                   style={{ height: `${(m.count / maxMonth) * 100}%`, minHeight: m.count > 0 ? '4px' : '2px' }}
@@ -92,8 +92,8 @@ export default async function AdminStatisticsPage() {
         </div>
 
         {/* By process */}
-        <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5">
-          <p className="text-sm font-semibold text-white mb-5">{t('by_process')}</p>
+        <div className="bg-white border border-slate-200 rounded-xl p-5">
+          <p className="text-sm font-semibold text-slate-900 mb-5">{t('by_process')}</p>
           <div className="space-y-3">
             {byProcess.length === 0 ? (
               <p className="text-slate-500 text-sm">No data.</p>
@@ -103,12 +103,12 @@ export default async function AdminStatisticsPage() {
                 return (
                   <div key={g.processTemplateId}>
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm text-slate-300 truncate">
+                      <span className="text-sm text-slate-600 truncate">
                         {nameMap[g.processTemplateId] ?? 'Unknown'}
                       </span>
                       <span className="text-xs text-slate-500 ml-2">{g._count.processTemplateId}</span>
                     </div>
-                    <div className="h-1.5 bg-slate-700 rounded-full">
+                    <div className="h-1.5 bg-slate-200 rounded-full">
                       <div className="h-full bg-blue-500 rounded-full" style={{ width: `${pct}%` }} />
                     </div>
                   </div>

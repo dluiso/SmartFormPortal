@@ -72,19 +72,19 @@ interface SelectFieldProps {
 function SelectField({ label, value, onChange, options, placeholder }: SelectFieldProps) {
   return (
     <div>
-      <label className="block text-xs font-medium text-slate-400 mb-1">{label}</label>
+      <label className="block text-xs font-medium text-slate-600 mb-1">{label}</label>
       <div className="relative">
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 pr-8 appearance-none focus:outline-none focus:border-blue-500"
+          className="w-full bg-white border border-slate-300 text-slate-900 text-sm rounded-lg px-3 py-2 pr-8 appearance-none focus:outline-none focus:border-blue-500"
         >
           <option value="">{placeholder}</option>
           {options.map((o) => (
             <option key={o.id} value={o.id}>{o.name}</option>
           ))}
         </select>
-        <ChevronDown className="absolute right-2.5 top-2.5 w-4 h-4 text-slate-400 pointer-events-none" />
+        <ChevronDown className="absolute right-2.5 top-2.5 w-4 h-4 text-slate-500 pointer-events-none" />
       </div>
     </div>
   );
@@ -113,31 +113,31 @@ function EditForm({ form, setForm, cancel, handleSave, saving, categories, depar
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1">Name *</label>
+          <label className="block text-xs font-medium text-slate-600 mb-1">Name *</label>
           <input
             type="text"
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+            className="w-full bg-white border border-slate-300 text-slate-900 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1">{tProc('public_url')}</label>
+          <label className="block text-xs font-medium text-slate-600 mb-1">{tProc('public_url')}</label>
           <input
             type="url"
             value={form.publicUrl}
             onChange={(e) => setForm({ ...form, publicUrl: e.target.value })}
-            className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+            className="w-full bg-white border border-slate-300 text-slate-900 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
             placeholder="https://..."
           />
         </div>
         <div className="md:col-span-2">
-          <label className="block text-xs font-medium text-slate-400 mb-1">Description</label>
+          <label className="block text-xs font-medium text-slate-600 mb-1">Description</label>
           <textarea
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
             rows={2}
-            className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500 resize-none"
+            className="w-full bg-white border border-slate-300 text-slate-900 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500 resize-none"
           />
         </div>
         <SelectField label="Category" value={form.categoryId}
@@ -150,30 +150,30 @@ function EditForm({ form, setForm, cancel, handleSave, saving, categories, depar
           onChange={(v) => setForm({ ...form, dbConnectionId: v })}
           options={dbConnections} placeholder="None (manual only)" />
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1">Sort Order</label>
+          <label className="block text-xs font-medium text-slate-600 mb-1">Sort Order</label>
           <input
             type="number"
             value={form.sortOrder}
             onChange={(e) => setForm({ ...form, sortOrder: Number(e.target.value) })}
-            className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+            className="w-full bg-white border border-slate-300 text-slate-900 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1">{tProc('available_from')}</label>
+          <label className="block text-xs font-medium text-slate-600 mb-1">{tProc('available_from')}</label>
           <input
             type="date"
             value={form.availableFrom}
             onChange={(e) => setForm({ ...form, availableFrom: e.target.value })}
-            className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+            className="w-full bg-white border border-slate-300 text-slate-900 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1">{tProc('available_until')}</label>
+          <label className="block text-xs font-medium text-slate-600 mb-1">{tProc('available_until')}</label>
           <input
             type="date"
             value={form.availableUntil}
             onChange={(e) => setForm({ ...form, availableUntil: e.target.value })}
-            className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+            className="w-full bg-white border border-slate-300 text-slate-900 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
           />
         </div>
       </div>
@@ -186,12 +186,12 @@ function EditForm({ form, setForm, cancel, handleSave, saving, categories, depar
               onChange={(e) => setForm({ ...form, [key]: e.target.checked })}
               className="w-4 h-4 accent-blue-600"
             />
-            <span className="text-sm text-slate-300">{label}</span>
+            <span className="text-sm text-slate-700">{label}</span>
           </label>
         ))}
       </div>
       <div className="flex gap-2 justify-end">
-        <Button variant="ghost" size="sm" onClick={cancel} className="text-slate-400">
+        <Button variant="ghost" size="sm" onClick={cancel} className="text-slate-500">
           <X className="w-3.5 h-3.5 mr-1" /> Cancel
         </Button>
         <Button size="sm" onClick={handleSave} disabled={saving} className="bg-blue-600 hover:bg-blue-700">
@@ -312,8 +312,8 @@ export default function ProcessTemplatesManager({ templates: init, categories, d
       </div>
 
       {editId === 'new' && (
-        <div className="bg-slate-800/50 border border-blue-500/50 rounded-xl p-5">
-          <h3 className="text-sm font-semibold text-white mb-4">{t('add_process')}</h3>
+        <div className="bg-white border border-blue-500/50 rounded-xl p-5">
+          <h3 className="text-sm font-semibold text-slate-900 mb-4">{t('add_process')}</h3>
           <EditForm form={form} setForm={setForm} cancel={cancel} handleSave={handleSave} saving={saving}
             categories={categories} departments={departments} dbConnections={dbConnections} tProc={t} />
         </div>
@@ -321,15 +321,15 @@ export default function ProcessTemplatesManager({ templates: init, categories, d
 
       <div className="space-y-2">
         {items.length === 0 && (
-          <div className="text-center py-12 text-slate-500 bg-slate-800/30 rounded-xl">
+          <div className="text-center py-12 text-slate-500 bg-slate-50 rounded-xl">
             {t('no_processes')}
           </div>
         )}
         {items.map((tmpl) => (
-          <div key={tmpl.id} className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
+          <div key={tmpl.id} className="bg-white border border-slate-200 rounded-xl p-4">
             {editId === tmpl.id ? (
               <>
-                <h3 className="text-sm font-semibold text-white mb-4">{t('edit_process')}</h3>
+                <h3 className="text-sm font-semibold text-slate-900 mb-4">{t('edit_process')}</h3>
                 <EditForm form={form} setForm={setForm} cancel={cancel} handleSave={handleSave} saving={saving}
                   categories={categories} departments={departments} dbConnections={dbConnections} tProc={t} />
               </>
@@ -340,9 +340,9 @@ export default function ProcessTemplatesManager({ templates: init, categories, d
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <p className="font-medium text-white">{tmpl.name}</p>
+                    <p className="font-medium text-slate-900">{tmpl.name}</p>
                     {!tmpl.isActive && (
-                      <Badge className="text-xs bg-slate-700 text-slate-400 border-0">Inactive</Badge>
+                      <Badge className="text-xs bg-slate-100 text-slate-500 border-0">Inactive</Badge>
                     )}
                     {!tmpl.isPublic && (
                       <Badge className="text-xs bg-orange-900/30 text-orange-400 border-0">Hidden</Badge>
@@ -372,7 +372,7 @@ export default function ProcessTemplatesManager({ templates: init, categories, d
                     <GitBranch className="w-3.5 h-3.5" />
                   </a>
                   <Button size="sm" variant="ghost" onClick={() => startEdit(tmpl)}
-                    className="h-7 w-7 p-0 text-slate-400 hover:text-white">
+                    className="h-7 w-7 p-0 text-slate-500 hover:text-slate-900">
                     <Pencil className="w-3.5 h-3.5" />
                   </Button>
                   <Button size="sm" variant="ghost" onClick={() => handleDelete(tmpl.id)}

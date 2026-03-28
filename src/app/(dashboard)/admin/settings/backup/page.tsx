@@ -39,8 +39,8 @@ export default async function BackupSettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Backup Configuration</h1>
-        <p className="text-slate-400 text-sm mt-1">
+        <h1 className="text-2xl font-bold text-slate-900">Backup Configuration</h1>
+        <p className="text-slate-500 text-sm mt-1">
           Configure automated database backups with scheduled runs and destination options.
         </p>
       </div>

@@ -3,11 +3,10 @@
 import { useState, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
-import { ExternalLink, Star, StarOff, Search, Filter } from 'lucide-react';
+import { ExternalLink, Star, Search } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 
 interface Process {
   id: string;
@@ -46,7 +45,6 @@ export default function AvailableProcesses({
 
   const toggleFavorite = async (processId: string) => {
     const isFav = favorites.has(processId);
-    // Optimistic update
     setFavorites((prev) => {
       const next = new Set(prev);
       isFav ? next.delete(processId) : next.add(processId);
@@ -60,7 +58,6 @@ export default function AvailableProcesses({
         });
         if (!res.ok) throw new Error();
       } catch {
-        // Revert on failure
         setFavorites((prev) => {
           const next = new Set(prev);
           isFav ? next.add(processId) : next.delete(processId);
@@ -92,23 +89,23 @@ export default function AvailableProcesses({
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-white">{tDash('available_processes')}</h2>
+        <h2 className="text-lg font-semibold text-slate-900">{tDash('available_processes')}</h2>
         <span className="text-sm text-slate-500">{filtered.length} available</span>
       </div>
 
       {/* Search */}
       <div className="relative mb-4">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={t('search_placeholder')}
-          className="pl-9 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-600 focus:border-blue-500"
+          className="pl-9 bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
         />
       </div>
 
       {filtered.length === 0 ? (
-        <div className="text-center py-16 text-slate-500">
+        <div className="text-center py-16 text-slate-400">
           <FileTextIcon className="w-10 h-10 mx-auto mb-3 opacity-30" />
           <p>{t('no_processes')}</p>
         </div>
@@ -146,18 +143,18 @@ function ProcessCard({
   const t = useTranslations('processes');
 
   return (
-    <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 hover:border-slate-600 transition-all group">
+    <div className="bg-white border border-slate-200 rounded-xl p-4 hover:border-slate-300 hover:shadow-sm transition-all group">
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1 min-w-0">
-          <h3 className="font-medium text-white text-sm leading-snug truncate pr-2">
+          <h3 className="font-medium text-slate-900 text-sm leading-snug truncate pr-2">
             {process.name}
           </h3>
           <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
             {process.category && (
               <Badge
                 variant="secondary"
-                className="text-xs h-5 px-1.5 bg-slate-700 text-slate-400 border-0"
+                className="text-xs h-5 px-1.5 bg-slate-100 text-slate-600 border-0"
                 style={
                   process.category.color
                     ? { backgroundColor: `${process.category.color}20`, color: process.category.color }
@@ -168,12 +165,12 @@ function ProcessCard({
               </Badge>
             )}
             {process.department && (
-              <Badge variant="outline" className="text-xs h-5 px-1.5 border-slate-700 text-slate-500">
+              <Badge variant="outline" className="text-xs h-5 px-1.5 border-slate-300 text-slate-500">
                 {process.department.name}
               </Badge>
             )}
             {process.requiresRenewal && (
-              <Badge variant="outline" className="text-xs h-5 px-1.5 border-purple-700/50 text-purple-400">
+              <Badge variant="outline" className="text-xs h-5 px-1.5 border-purple-200 text-purple-600">
                 Annual
               </Badge>
             )}
@@ -181,7 +178,7 @@ function ProcessCard({
         </div>
         <button
           onClick={onToggleFavorite}
-          className="flex-shrink-0 text-slate-600 hover:text-amber-400 transition-colors ml-1"
+          className="flex-shrink-0 text-slate-300 hover:text-amber-500 transition-colors ml-1"
           title={isFavorite ? t('unfavorite') : t('favorite')}
         >
           {isFavorite ? (

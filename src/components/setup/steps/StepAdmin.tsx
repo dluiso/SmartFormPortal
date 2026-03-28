@@ -42,35 +42,35 @@ export default function StepAdmin({ data, onChange, onFinish, onBack, loading }:
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-white mb-2">Admin Account</h2>
-      <p className="text-slate-400 text-sm mb-6">
+      <h2 className="text-2xl font-bold text-slate-900 mb-2">Admin Account</h2>
+      <p className="text-slate-500 text-sm mb-6">
         Create the global super administrator account. This account has full access to all features.
       </p>
 
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div>
-          <Label className="text-slate-300 mb-1.5 block">
+          <Label className="text-slate-700 mb-1.5 block">
             First Name <span className="text-red-400">*</span>
           </Label>
           <Input
             value={data.adminFirstName}
             onChange={(e) => onChange({ adminFirstName: e.target.value })}
             placeholder="John"
-            className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 focus:border-blue-500"
+            className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
           />
           {errors.adminFirstName && (
             <p className="text-red-400 text-xs mt-1">{errors.adminFirstName}</p>
           )}
         </div>
         <div>
-          <Label className="text-slate-300 mb-1.5 block">
+          <Label className="text-slate-700 mb-1.5 block">
             Last Name <span className="text-red-400">*</span>
           </Label>
           <Input
             value={data.adminLastName}
             onChange={(e) => onChange({ adminLastName: e.target.value })}
             placeholder="Doe"
-            className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 focus:border-blue-500"
+            className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
           />
           {errors.adminLastName && (
             <p className="text-red-400 text-xs mt-1">{errors.adminLastName}</p>
@@ -87,7 +87,7 @@ export default function StepAdmin({ data, onChange, onFinish, onBack, loading }:
           value={data.adminEmail}
           onChange={(e) => onChange({ adminEmail: e.target.value })}
           placeholder="admin@yourdomain.com"
-          className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 focus:border-blue-500"
+          className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
         />
         {errors.adminEmail && (
           <p className="text-red-400 text-xs mt-1">{errors.adminEmail}</p>
@@ -104,12 +104,12 @@ export default function StepAdmin({ data, onChange, onFinish, onBack, loading }:
             value={data.adminPassword}
             onChange={(e) => onChange({ adminPassword: e.target.value })}
             placeholder="Min 8 chars, uppercase, lowercase, number"
-            className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 focus:border-blue-500 pr-10"
+            className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500 pr-10"
           />
           <button
             type="button"
             onClick={() => setShowPass(!showPass)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
           >
             {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
@@ -129,12 +129,12 @@ export default function StepAdmin({ data, onChange, onFinish, onBack, loading }:
             value={data.adminConfirmPassword}
             onChange={(e) => onChange({ adminConfirmPassword: e.target.value })}
             placeholder="Repeat your password"
-            className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 focus:border-blue-500 pr-10"
+            className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500 pr-10"
           />
           <button
             type="button"
             onClick={() => setShowConfirm(!showConfirm)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
           >
             {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
@@ -149,7 +149,7 @@ export default function StepAdmin({ data, onChange, onFinish, onBack, loading }:
           variant="outline"
           onClick={onBack}
           disabled={loading}
-          className="flex-1 border-slate-600 text-slate-300 hover:bg-slate-700"
+          className="flex-1 border-slate-300 text-slate-600 hover:bg-slate-100"
         >
           Back
         </Button>

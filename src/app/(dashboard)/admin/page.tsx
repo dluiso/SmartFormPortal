@@ -44,38 +44,38 @@ export default async function AdminOverviewPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-white">{t('title')}</h1>
+      <h1 className="text-2xl font-bold text-slate-900">{t('title')}</h1>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {cards.map((c) => (
-          <div key={c.label} className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5">
+          <div key={c.label} className="bg-white border border-slate-200 rounded-xl p-5">
             <div className={`w-10 h-10 ${c.bg} rounded-lg flex items-center justify-center mb-3`}>
               <c.icon className={`w-5 h-5 ${c.color}`} />
             </div>
-            <p className="text-2xl font-bold text-white">{c.value}</p>
-            <p className="text-slate-400 text-sm mt-0.5">{c.label}</p>
+            <p className="text-2xl font-bold text-slate-900">{c.value}</p>
+            <p className="text-slate-500 text-sm mt-0.5">{c.label}</p>
           </div>
         ))}
       </div>
 
-      <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl">
-        <div className="px-5 py-4 border-b border-slate-700/50">
-          <h2 className="font-semibold text-white">{t('recent_activity')}</h2>
+      <div className="bg-white border border-slate-200 rounded-xl">
+        <div className="px-5 py-4 border-b border-slate-200">
+          <h2 className="font-semibold text-slate-900">{t('recent_activity')}</h2>
         </div>
-        <div className="divide-y divide-slate-700/50">
+        <div className="divide-y divide-slate-200">
           {recentActivity.length === 0 ? (
             <p className="px-5 py-8 text-center text-slate-500 text-sm">No recent activity.</p>
           ) : (
             recentActivity.map((log) => (
               <div key={log.id} className="px-5 py-3 flex items-center gap-3">
-                <div className="w-8 h-8 bg-slate-700 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-xs font-bold text-slate-400">
+                <div className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-xs font-bold text-slate-500">
                     {log.user?.email?.charAt(0).toUpperCase() ?? '?'}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-slate-300">
-                    <span className="font-medium text-white">
+                  <p className="text-sm text-slate-600">
+                    <span className="font-medium text-slate-900">
                       {log.user ? `${log.user.firstName ?? ''} ${log.user.lastName ?? ''}`.trim() || log.user.email : 'System'}
                     </span>{' '}
                     {log.action.toLowerCase().replace(/_/g, ' ')}
@@ -84,7 +84,7 @@ export default async function AdminOverviewPage() {
                     <p className="text-xs text-slate-500 truncate">{JSON.stringify(log.details)}</p>
                   )}
                 </div>
-                <span className="text-xs text-slate-600 flex-shrink-0">
+                <span className="text-xs text-slate-400 flex-shrink-0">
                   {new Date(log.createdAt).toLocaleString()}
                 </span>
               </div>

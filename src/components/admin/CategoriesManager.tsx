@@ -36,28 +36,28 @@ function InlineForm({ form, setForm, cancel, handleSave, saving }: InlineFormPro
     <div className="space-y-3">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1">Name *</label>
+          <label className="block text-xs font-medium text-slate-600 mb-1">Name *</label>
           <input
             type="text"
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+            className="w-full bg-white border border-slate-300 text-slate-900 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
             placeholder="Category name"
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1">Description</label>
+          <label className="block text-xs font-medium text-slate-600 mb-1">Description</label>
           <input
             type="text"
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
-            className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+            className="w-full bg-white border border-slate-300 text-slate-900 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
             placeholder="Optional"
           />
         </div>
       </div>
       <div>
-        <label className="block text-xs font-medium text-slate-400 mb-2">Color</label>
+        <label className="block text-xs font-medium text-slate-600 mb-2">Color</label>
         <div className="flex gap-2 flex-wrap">
           {COLORS.map((c) => (
             <button
@@ -152,20 +152,20 @@ export default function CategoriesManager({ categories: init }: Props) {
       </div>
 
       {editId === 'new' && (
-        <div className="bg-slate-800/50 border border-blue-500/50 rounded-xl p-4">
-          <h3 className="text-sm font-semibold text-white mb-3">{t('add_category')}</h3>
+        <div className="bg-white border border-blue-500/50 rounded-xl p-4">
+          <h3 className="text-sm font-semibold text-slate-900 mb-3">{t('add_category')}</h3>
           <InlineForm form={form} setForm={setForm} cancel={cancel} handleSave={handleSave} saving={saving} />
         </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {items.length === 0 && (
-          <div className="col-span-full text-center py-12 text-slate-500 bg-slate-800/30 rounded-xl">
+          <div className="col-span-full text-center py-12 text-slate-500 bg-slate-50 rounded-xl">
             {t('no_categories')}
           </div>
         )}
         {items.map((cat) => (
-          <div key={cat.id} className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
+          <div key={cat.id} className="bg-white border border-slate-200 rounded-xl p-4">
             {editId === cat.id ? (
               <InlineForm form={form} setForm={setForm} cancel={cancel} handleSave={handleSave} saving={saving} />
             ) : (
@@ -177,7 +177,7 @@ export default function CategoriesManager({ categories: init }: Props) {
                   <Tag className="w-5 h-5" style={{ color: cat.color ?? COLORS[0] }} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-white">{cat.name}</p>
+                  <p className="font-medium text-slate-900">{cat.name}</p>
                   {cat.description && (
                     <p className="text-xs text-slate-500 truncate mt-0.5">{cat.description}</p>
                   )}
@@ -187,7 +187,7 @@ export default function CategoriesManager({ categories: init }: Props) {
                 </div>
                 <div className="flex gap-1">
                   <Button size="sm" variant="ghost" onClick={() => startEdit(cat)}
-                    className="h-7 w-7 p-0 text-slate-400 hover:text-white">
+                    className="h-7 w-7 p-0 text-slate-500 hover:text-slate-900">
                     <Pencil className="w-3.5 h-3.5" />
                   </Button>
                   <Button size="sm" variant="ghost" onClick={() => handleDelete(cat.id)}

@@ -31,8 +31,8 @@ export default async function EmailSettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Email Settings</h1>
-        <p className="text-slate-400 text-sm mt-1">
+        <h1 className="text-2xl font-bold text-slate-900">Email Settings</h1>
+        <p className="text-slate-500 text-sm mt-1">
           Configure the SMTP relay used for transactional emails (status updates, messages, password resets).
         </p>
       </div>

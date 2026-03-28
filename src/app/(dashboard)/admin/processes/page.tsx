@@ -21,7 +21,7 @@ export default async function AdminProcessesPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-white">{t('title')}</h1>
+      <h1 className="text-2xl font-bold text-slate-900">{t('title')}</h1>
       <ProcessTemplatesManager
         templates={templates}
         categories={categories}

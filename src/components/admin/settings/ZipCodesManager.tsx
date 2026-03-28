@@ -87,10 +87,10 @@ export default function ZipCodesManager({ initial, initialEnforce }: Props) {
   return (
     <div className="space-y-6 max-w-2xl">
       {/* Toggle */}
-      <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5">
+      <div className="bg-white border border-slate-200 rounded-xl p-5">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-semibold text-white">Enforce ZIP Code Restriction</p>
+            <p className="text-sm font-semibold text-slate-900">Enforce ZIP Code Restriction</p>
             <p className="text-xs text-slate-500 mt-0.5">
               When enabled, only users with an allowed ZIP code may register.
             </p>
@@ -101,7 +101,7 @@ export default function ZipCodesManager({ initial, initialEnforce }: Props) {
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               enforce
                 ? 'bg-green-600/20 text-green-400 border border-green-700/50 hover:bg-green-600/30'
-                : 'bg-slate-700 text-slate-400 border border-slate-600 hover:bg-slate-600'
+                : 'bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200'
             }`}
           >
             {enforce ? (
@@ -114,8 +114,8 @@ export default function ZipCodesManager({ initial, initialEnforce }: Props) {
       </div>
 
       {/* Add ZIP */}
-      <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 space-y-4">
-        <h2 className="text-sm font-semibold text-white">Add Allowed ZIP Code</h2>
+      <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4">
+        <h2 className="text-sm font-semibold text-slate-900">Add Allowed ZIP Code</h2>
         <div className="grid grid-cols-3 gap-3">
           <div>
             <label className="block text-xs text-slate-500 mb-1">ZIP Code *</label>
@@ -123,7 +123,7 @@ export default function ZipCodesManager({ initial, initialEnforce }: Props) {
               value={zipInput}
               onChange={(e) => setZipInput(e.target.value)}
               placeholder="90210"
-              className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-600 focus:border-blue-500 font-mono"
+              className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500 font-mono"
               onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
             />
           </div>
@@ -133,7 +133,7 @@ export default function ZipCodesManager({ initial, initialEnforce }: Props) {
               value={cityInput}
               onChange={(e) => setCityInput(e.target.value)}
               placeholder="Beverly Hills"
-              className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-600 focus:border-blue-500"
+              className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
             />
           </div>
           <div>
@@ -142,7 +142,7 @@ export default function ZipCodesManager({ initial, initialEnforce }: Props) {
               value={stateInput}
               onChange={(e) => setStateInput(e.target.value)}
               placeholder="CA"
-              className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-600 focus:border-blue-500"
+              className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
             />
           </div>
         </div>
@@ -153,23 +153,23 @@ export default function ZipCodesManager({ initial, initialEnforce }: Props) {
       </div>
 
       {/* List */}
-      <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700/50">
-          <span className="text-sm font-semibold text-white">Allowed ZIP Codes</span>
-          <Badge className="bg-slate-700 text-slate-400 border-0">{zipCodes.length}</Badge>
+      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200">
+          <span className="text-sm font-semibold text-slate-900">Allowed ZIP Codes</span>
+          <Badge className="bg-slate-100 text-slate-500 border-0">{zipCodes.length}</Badge>
         </div>
 
         {zipCodes.length === 0 ? (
-          <div className="py-10 text-center text-slate-600 text-sm">
+          <div className="py-10 text-center text-slate-500 text-sm">
             No ZIP codes added. All ZIP codes are allowed.
           </div>
         ) : (
-          <div className="divide-y divide-slate-700/30 max-h-80 overflow-y-auto">
+          <div className="divide-y divide-slate-200 max-h-80 overflow-y-auto">
             {zipCodes.map((z) => (
               <div key={z.id} className="flex items-center justify-between px-4 py-2.5">
                 <div className="flex items-center gap-3">
                   <MapPin className="w-3.5 h-3.5 text-slate-600 flex-shrink-0" />
-                  <span className="text-sm font-mono text-white">{z.zipCode}</span>
+                  <span className="text-sm font-mono text-slate-900">{z.zipCode}</span>
                   {(z.city || z.state) && (
                     <span className="text-xs text-slate-500">
                       {[z.city, z.state].filter(Boolean).join(', ')}

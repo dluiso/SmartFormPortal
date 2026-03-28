@@ -45,13 +45,13 @@ export default function GeneralSettingsForm({ settings }: Props) {
 
   return (
     <div className="max-w-lg space-y-5">
-      <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6 space-y-5">
+      <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-5">
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1.5">{t('default_language')}</label>
+          <label className="block text-xs font-medium text-slate-600 mb-1.5">{t('default_language')}</label>
           <select
             value={form.defaultLanguage}
             onChange={(e) => setForm({ ...form, defaultLanguage: e.target.value })}
-            className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+            className="w-full bg-white border border-slate-300 text-slate-900 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
           >
             <option value="en">English</option>
             <option value="es">Español</option>
@@ -66,10 +66,10 @@ export default function GeneralSettingsForm({ settings }: Props) {
             ] as { key: keyof typeof form; label: string }[]
           ).map(({ key, label }) => (
             <label key={key} className="flex items-center justify-between">
-              <span className="text-sm text-slate-300">{label}</span>
+              <span className="text-sm text-slate-700">{label}</span>
               <div
                 onClick={() => setForm({ ...form, [key]: !form[key] })}
-                className={`relative w-10 h-5 rounded-full cursor-pointer transition-colors ${form[key] ? 'bg-blue-600' : 'bg-slate-700'}`}
+                className={`relative w-10 h-5 rounded-full cursor-pointer transition-colors ${form[key] ? 'bg-blue-600' : 'bg-slate-300'}`}
               >
                 <div
                   className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${form[key] ? 'translate-x-5' : 'translate-x-0.5'}`}

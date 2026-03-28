@@ -18,7 +18,7 @@ export default async function MyProcessesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">{t('title')}</h1>
+        <h1 className="text-2xl font-bold text-slate-900">{t('title')}</h1>
       </div>
       <MyProcessesList instances={processInstances} />
     </div>

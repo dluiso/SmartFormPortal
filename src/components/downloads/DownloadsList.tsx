@@ -45,10 +45,10 @@ export default function DownloadsList({ instances }: Props) {
   if (instances.length === 0) {
     return (
       <div className="text-center py-20">
-        <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
-          <FileText className="w-8 h-8 text-slate-600" />
+        <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <FileText className="w-8 h-8 text-slate-400" />
         </div>
-        <p className="text-slate-400">{t('no_downloads')}</p>
+        <p className="text-slate-500">{t('no_downloads')}</p>
       </div>
     );
   }
@@ -58,14 +58,14 @@ export default function DownloadsList({ instances }: Props) {
       {instances.map((inst) => (
         <div
           key={inst.id}
-          className="flex items-center justify-between bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 hover:border-slate-600 transition-all"
+          className="flex items-center justify-between bg-white border border-slate-200 rounded-xl p-4 hover:border-slate-300 transition-all"
         >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-green-600/20 rounded-lg flex items-center justify-center flex-shrink-0">
               <FileText className="w-5 h-5 text-green-400" />
             </div>
             <div>
-              <p className="font-medium text-white text-sm">{inst.processTemplate.name}</p>
+              <p className="font-medium text-slate-900 text-sm">{inst.processTemplate.name}</p>
               <div className="flex items-center gap-2 mt-0.5">
                 <Badge className="text-xs bg-green-900/30 text-green-400 border-0">Approved</Badge>
                 {inst.completionDate && (
@@ -81,7 +81,7 @@ export default function DownloadsList({ instances }: Props) {
             variant="outline"
             onClick={() => handleDownload(inst.id, inst.processTemplate.name)}
             disabled={downloading === inst.id}
-            className="border-slate-600 text-slate-300 hover:bg-slate-700 h-8"
+            className="border-slate-300 text-slate-600 hover:bg-slate-100 h-8"
           >
             {downloading === inst.id ? (
               <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />

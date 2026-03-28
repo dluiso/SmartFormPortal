@@ -104,11 +104,11 @@ export default function DepartmentsManager({ departments: init }: Props) {
 
       {/* Inline create form */}
       {editId === 'new' && (
-        <div className="bg-slate-800/50 border border-blue-500/50 rounded-xl p-4 space-y-3">
-          <h3 className="text-sm font-semibold text-white">{t('add_department')}</h3>
+        <div className="bg-white border border-blue-500/50 rounded-xl p-4 space-y-3">
+          <h3 className="text-sm font-semibold text-slate-900">{t('add_department')}</h3>
           <FormFields form={form} onChange={setForm} />
           <div className="flex gap-2 justify-end">
-            <Button variant="ghost" size="sm" onClick={cancel} className="text-slate-400">
+            <Button variant="ghost" size="sm" onClick={cancel} className="text-slate-500">
               <X className="w-3.5 h-3.5 mr-1" /> Cancel
             </Button>
             <Button size="sm" onClick={handleSave} disabled={saving} className="bg-blue-600 hover:bg-blue-700">
@@ -120,20 +120,20 @@ export default function DepartmentsManager({ departments: init }: Props) {
 
       <div className="space-y-2">
         {items.length === 0 && (
-          <div className="text-center py-12 text-slate-500 bg-slate-800/30 rounded-xl">
+          <div className="text-center py-12 text-slate-500 bg-slate-50 rounded-xl">
             {t('no_departments')}
           </div>
         )}
         {items.map((dept) => (
           <div
             key={dept.id}
-            className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4"
+            className="bg-white border border-slate-200 rounded-xl p-4"
           >
             {editId === dept.id ? (
               <div className="space-y-3">
                 <FormFields form={form} onChange={setForm} />
                 <div className="flex gap-2 justify-end">
-                  <Button variant="ghost" size="sm" onClick={cancel} className="text-slate-400">
+                  <Button variant="ghost" size="sm" onClick={cancel} className="text-slate-500">
                     <X className="w-3.5 h-3.5 mr-1" /> Cancel
                   </Button>
                   <Button size="sm" onClick={handleSave} disabled={saving} className="bg-blue-600 hover:bg-blue-700">
@@ -143,14 +143,14 @@ export default function DepartmentsManager({ departments: init }: Props) {
               </div>
             ) : (
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Building2 className="w-5 h-5 text-slate-400" />
+                <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Building2 className="w-5 h-5 text-slate-500" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="font-medium text-white">{dept.name}</p>
+                    <p className="font-medium text-slate-900">{dept.name}</p>
                     {!dept.isActive && (
-                      <Badge className="text-xs bg-slate-700 text-slate-400 border-0">Inactive</Badge>
+                      <Badge className="text-xs bg-slate-100 text-slate-500 border-0">Inactive</Badge>
                     )}
                   </div>
                   {dept.description && (
@@ -164,7 +164,7 @@ export default function DepartmentsManager({ departments: init }: Props) {
                   <Button
                     size="sm" variant="ghost"
                     onClick={() => startEdit(dept)}
-                    className="h-7 w-7 p-0 text-slate-400 hover:text-white"
+                    className="h-7 w-7 p-0 text-slate-500 hover:text-slate-900"
                   >
                     <Pencil className="w-3.5 h-3.5" />
                   </Button>
@@ -195,22 +195,22 @@ function FormFields({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
       <div>
-        <label className="block text-xs font-medium text-slate-400 mb-1">Name *</label>
+        <label className="block text-xs font-medium text-slate-600 mb-1">Name *</label>
         <input
           type="text"
           value={form.name}
           onChange={(e) => onChange({ ...form, name: e.target.value })}
-          className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+          className="w-full bg-white border border-slate-300 text-slate-900 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
           placeholder="Department name"
         />
       </div>
       <div>
-        <label className="block text-xs font-medium text-slate-400 mb-1">Description</label>
+        <label className="block text-xs font-medium text-slate-600 mb-1">Description</label>
         <input
           type="text"
           value={form.description}
           onChange={(e) => onChange({ ...form, description: e.target.value })}
-          className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+          className="w-full bg-white border border-slate-300 text-slate-900 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
           placeholder="Optional description"
         />
       </div>
@@ -222,7 +222,7 @@ function FormFields({
           onChange={(e) => onChange({ ...form, isActive: e.target.checked })}
           className="w-4 h-4 accent-blue-600"
         />
-        <label htmlFor="dept-active" className="text-sm text-slate-300">Active</label>
+        <label htmlFor="dept-active" className="text-sm text-slate-700">Active</label>
       </div>
     </div>
   );

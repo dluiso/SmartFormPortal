@@ -73,18 +73,18 @@ function EditForm({ form, setForm, cancel, handleSave, saving, editId, tConn }: 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {fields.map(({ key, label, placeholder }) => (
           <div key={key}>
-            <label className="block text-xs font-medium text-slate-400 mb-1">{label}</label>
+            <label className="block text-xs font-medium text-slate-600 mb-1">{label}</label>
             <input
               type={key === 'port' ? 'number' : 'text'}
               value={form[key] as string}
               onChange={(e) => setForm({ ...form, [key]: e.target.value })}
               placeholder={placeholder}
-              className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+              className="w-full bg-white border border-slate-300 text-slate-900 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
             />
           </div>
         ))}
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1">
+          <label className="block text-xs font-medium text-slate-600 mb-1">
             {tConn('password')} {editId !== 'new' ? '(leave blank to keep current)' : '*'}
           </label>
           <input
@@ -92,7 +92,7 @@ function EditForm({ form, setForm, cancel, handleSave, saving, editId, tConn }: 
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
             placeholder="••••••••"
-            className="w-full bg-slate-700 border border-slate-600 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+            className="w-full bg-white border border-slate-300 text-slate-900 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
           />
         </div>
       </div>
@@ -102,10 +102,10 @@ function EditForm({ form, setForm, cancel, handleSave, saving, editId, tConn }: 
           onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
           className="w-4 h-4 accent-blue-600"
         />
-        <span className="text-sm text-slate-300">Active</span>
+        <span className="text-sm text-slate-700">Active</span>
       </label>
       <div className="flex gap-2 justify-end">
-        <Button variant="ghost" size="sm" onClick={cancel} className="text-slate-400">
+        <Button variant="ghost" size="sm" onClick={cancel} className="text-slate-500">
           <X className="w-3.5 h-3.5 mr-1" /> Cancel
         </Button>
         <Button size="sm" onClick={handleSave} disabled={saving} className="bg-blue-600 hover:bg-blue-700">
@@ -223,33 +223,33 @@ export default function DbConnectionsManager({ connections: init }: Props) {
       </div>
 
       {editId === 'new' && (
-        <div className="bg-slate-800/50 border border-blue-500/50 rounded-xl p-5">
-          <h3 className="text-sm font-semibold text-white mb-4">{t('add_connection')}</h3>
+        <div className="bg-white border border-blue-500/50 rounded-xl p-5">
+          <h3 className="text-sm font-semibold text-slate-900 mb-4">{t('add_connection')}</h3>
           <EditForm form={form} setForm={setForm} cancel={cancel} handleSave={handleSave} saving={saving} editId={editId} tConn={t} />
         </div>
       )}
 
       <div className="space-y-2">
         {items.length === 0 && (
-          <div className="text-center py-12 text-slate-500 bg-slate-800/30 rounded-xl">
+          <div className="text-center py-12 text-slate-500 bg-slate-50 rounded-xl">
             {t('no_connections')}
           </div>
         )}
         {items.map((conn) => (
-          <div key={conn.id} className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
+          <div key={conn.id} className="bg-white border border-slate-200 rounded-xl p-4">
             {editId === conn.id ? (
               <>
-                <h3 className="text-sm font-semibold text-white mb-4">{t('edit_connection')}</h3>
+                <h3 className="text-sm font-semibold text-slate-900 mb-4">{t('edit_connection')}</h3>
                 <EditForm form={form} setForm={setForm} cancel={cancel} handleSave={handleSave} saving={saving} editId={editId} tConn={t} />
               </>
             ) : (
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Database className="w-5 h-5 text-slate-400" />
+                <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Database className="w-5 h-5 text-slate-500" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="font-medium text-white">{conn.name}</p>
+                    <p className="font-medium text-slate-900">{conn.name}</p>
                     {conn.lastTestSuccess === true && (
                       <Wifi className="w-3.5 h-3.5 text-green-400" />
                     )}
@@ -257,7 +257,7 @@ export default function DbConnectionsManager({ connections: init }: Props) {
                       <WifiOff className="w-3.5 h-3.5 text-red-400" />
                     )}
                     {!conn.isActive && (
-                      <Badge className="text-xs bg-slate-700 text-slate-400 border-0">Inactive</Badge>
+                      <Badge className="text-xs bg-slate-100 text-slate-500 border-0">Inactive</Badge>
                     )}
                   </div>
                   <p className="text-xs text-slate-500 mt-0.5">
@@ -274,7 +274,7 @@ export default function DbConnectionsManager({ connections: init }: Props) {
                     size="sm" variant="outline"
                     onClick={() => handleTest(conn.id)}
                     disabled={testing === conn.id}
-                    className="h-7 text-xs border-slate-600 text-slate-300 hover:bg-slate-700"
+                    className="h-7 text-xs border-slate-300 text-slate-600 hover:bg-slate-100"
                   >
                     {testing === conn.id ? (
                       <Loader2 className="w-3 h-3 animate-spin mr-1" />
@@ -284,7 +284,7 @@ export default function DbConnectionsManager({ connections: init }: Props) {
                     Test
                   </Button>
                   <Button size="sm" variant="ghost" onClick={() => startEdit(conn)}
-                    className="h-7 w-7 p-0 text-slate-400 hover:text-white">
+                    className="h-7 w-7 p-0 text-slate-500 hover:text-slate-900">
                     <Pencil className="w-3.5 h-3.5" />
                   </Button>
                   <Button size="sm" variant="ghost" onClick={() => handleDelete(conn.id)}

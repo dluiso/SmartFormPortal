@@ -84,8 +84,8 @@ export default function EmailSettingsForm({ initial }: Props) {
   return (
     <div className="space-y-6 max-w-2xl">
       {/* Provider */}
-      <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 space-y-5">
-        <h2 className="text-sm font-semibold text-white">Email Provider</h2>
+      <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-5">
+        <h2 className="text-sm font-semibold text-slate-900">Email Provider</h2>
 
         <div className="grid grid-cols-3 gap-3">
           {(['smtp', 'sendgrid', 'mailgun'] as const).map((p) => (
@@ -95,7 +95,7 @@ export default function EmailSettingsForm({ initial }: Props) {
               className={`px-4 py-2.5 rounded-lg border text-sm font-medium transition-all ${
                 form.provider === p
                   ? 'border-blue-500 bg-blue-500/10 text-blue-400'
-                  : 'border-slate-700 text-slate-400 hover:border-slate-600 hover:text-slate-300'
+                  : 'border-slate-200 text-slate-600 hover:border-slate-300 hover:text-slate-700'
               }`}
             >
               {PROVIDER_LABELS[p]}
@@ -105,8 +105,8 @@ export default function EmailSettingsForm({ initial }: Props) {
       </div>
 
       {/* Connection settings */}
-      <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 space-y-4">
-        <h2 className="text-sm font-semibold text-white">Connection</h2>
+      <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4">
+        <h2 className="text-sm font-semibold text-slate-900">Connection</h2>
 
         {showSmtpFields && (
           <div className="grid grid-cols-3 gap-3">
@@ -116,7 +116,7 @@ export default function EmailSettingsForm({ initial }: Props) {
                 value={form.host}
                 onChange={(e) => set('host', e.target.value)}
                 placeholder="smtp.example.com"
-                className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-600 focus:border-blue-500"
+                className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
               />
             </div>
             <div>
@@ -125,7 +125,7 @@ export default function EmailSettingsForm({ initial }: Props) {
                 type="number"
                 value={form.port}
                 onChange={(e) => set('port', parseInt(e.target.value) || 587)}
-                className="bg-slate-900 border-slate-700 text-white focus:border-blue-500"
+                className="bg-white border-slate-300 text-slate-900 focus:border-blue-500"
               />
             </div>
           </div>
@@ -137,9 +137,9 @@ export default function EmailSettingsForm({ initial }: Props) {
               type="checkbox"
               checked={form.secure}
               onChange={(e) => set('secure', e.target.checked)}
-              className="w-4 h-4 rounded border-slate-600 bg-slate-800 accent-blue-500"
+              className="w-4 h-4 rounded border-slate-300 bg-white accent-blue-500"
             />
-            <span className="text-sm text-slate-300">Use SSL/TLS (port 465)</span>
+            <span className="text-sm text-slate-700">Use SSL/TLS (port 465)</span>
           </label>
         )}
 
@@ -170,7 +170,7 @@ export default function EmailSettingsForm({ initial }: Props) {
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700"
             >
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
@@ -179,8 +179,8 @@ export default function EmailSettingsForm({ initial }: Props) {
       </div>
 
       {/* Sender identity */}
-      <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 space-y-4">
-        <h2 className="text-sm font-semibold text-white">Sender Identity</h2>
+      <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4">
+        <h2 className="text-sm font-semibold text-slate-900">Sender Identity</h2>
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs text-slate-500 mb-1">From Name</label>
@@ -215,7 +215,7 @@ export default function EmailSettingsForm({ initial }: Props) {
           disabled={testing}
           variant="outline"
           size="sm"
-          className="border-slate-700 text-slate-300 hover:bg-slate-800"
+          className="border-slate-300 text-slate-600 hover:bg-slate-100"
         >
           <TestTube className="w-3.5 h-3.5 mr-1.5" />
           {testing ? 'Testing...' : 'Send Test Email'}

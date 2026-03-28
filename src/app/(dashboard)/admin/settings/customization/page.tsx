@@ -25,8 +25,8 @@ export default async function CustomizationSettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Customization</h1>
-        <p className="text-slate-400 text-sm mt-1">
+        <h1 className="text-2xl font-bold text-slate-900">Customization</h1>
+        <p className="text-slate-500 text-sm mt-1">
           Configure portal branding, colors, and custom CSS.
         </p>
       </div>

@@ -46,8 +46,8 @@ export default function StatisticsView({ counts, avgDays, monthlyData, categoryD
       label: t('cancelled'),
       value: counts.CANCELLED ?? 0,
       icon: Ban,
-      color: 'text-slate-400',
-      bg: 'bg-slate-600/20',
+      color: 'text-slate-500',
+      bg: 'bg-slate-100',
     },
   ];
 
@@ -60,22 +60,22 @@ export default function StatisticsView({ counts, avgDays, monthlyData, categoryD
         {stats.map((s) => (
           <div
             key={s.label}
-            className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4"
+            className="bg-white border border-slate-200 rounded-xl p-4"
           >
             <div className={`w-10 h-10 ${s.bg} rounded-lg flex items-center justify-center mb-3`}>
               <s.icon className={`w-5 h-5 ${s.color}`} />
             </div>
-            <p className="text-2xl font-bold text-white">{s.value}</p>
-            <p className="text-slate-400 text-xs mt-0.5">{s.label}</p>
+            <p className="text-2xl font-bold text-slate-900">{s.value}</p>
+            <p className="text-slate-500 text-xs mt-0.5">{s.label}</p>
           </div>
         ))}
       </div>
 
       {/* Avg processing time */}
       {avgDays !== null && (
-        <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5">
-          <p className="text-sm font-medium text-slate-300 mb-1">{t('avg_processing_time')}</p>
-          <p className="text-3xl font-bold text-white">
+        <div className="bg-white border border-slate-200 rounded-xl p-5">
+          <p className="text-sm font-medium text-slate-600 mb-1">{t('avg_processing_time')}</p>
+          <p className="text-3xl font-bold text-slate-900">
             {t('days', { count: avgDays })}
           </p>
           <p className="text-xs text-slate-500 mt-1">Average from submission to approval</p>
@@ -84,10 +84,10 @@ export default function StatisticsView({ counts, avgDays, monthlyData, categoryD
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Monthly bar chart */}
-        <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5">
+        <div className="bg-white border border-slate-200 rounded-xl p-5">
           <div className="flex items-center gap-2 mb-5">
-            <BarChart3 className="w-4 h-4 text-blue-400" />
-            <p className="text-sm font-semibold text-white">Applications per Month</p>
+            <BarChart3 className="w-4 h-4 text-blue-500" />
+            <p className="text-sm font-semibold text-slate-900">Applications per Month</p>
           </div>
           {monthlyData.every((m) => m.count === 0) ? (
             <p className="text-slate-500 text-sm">{t('no_data')}</p>
@@ -95,7 +95,7 @@ export default function StatisticsView({ counts, avgDays, monthlyData, categoryD
             <div className="flex items-end gap-2 h-32">
               {monthlyData.map((m) => (
                 <div key={m.month} className="flex-1 flex flex-col items-center gap-1.5">
-                  <span className="text-xs text-slate-400">{m.count || ''}</span>
+                  <span className="text-xs text-slate-500">{m.count || ''}</span>
                   <div
                     className="w-full bg-blue-600/70 rounded-t transition-all"
                     style={{ height: `${(m.count / maxMonth) * 100}%`, minHeight: m.count > 0 ? '4px' : '2px' }}
@@ -108,8 +108,8 @@ export default function StatisticsView({ counts, avgDays, monthlyData, categoryD
         </div>
 
         {/* By category */}
-        <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5">
-          <p className="text-sm font-semibold text-white mb-5">By Category</p>
+        <div className="bg-white border border-slate-200 rounded-xl p-5">
+          <p className="text-sm font-semibold text-slate-900 mb-5">By Category</p>
           {categoryData.length === 0 ? (
             <p className="text-slate-500 text-sm">{t('no_data')}</p>
           ) : (
@@ -119,10 +119,10 @@ export default function StatisticsView({ counts, avgDays, monthlyData, categoryD
                 return (
                   <div key={c.name}>
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm text-slate-300 truncate">{c.name}</span>
+                      <span className="text-sm text-slate-600 truncate">{c.name}</span>
                       <span className="text-xs text-slate-500 ml-2">{c.count}</span>
                     </div>
-                    <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-blue-500 rounded-full transition-all"
                         style={{ width: `${pct}%` }}

@@ -36,12 +36,12 @@ interface Props {
 }
 
 const statusConfig: Record<ProcessStatus, { label: string; icon: React.ElementType; color: string; bg: string }> = {
-  DRAFT: { label: 'Draft', icon: AlertCircle, color: 'text-slate-400', bg: 'bg-slate-700' },
+  DRAFT: { label: 'Draft', icon: AlertCircle, color: 'text-slate-500', bg: 'bg-slate-100' },
   PENDING: { label: 'Pending', icon: Clock, color: 'text-amber-400', bg: 'bg-amber-900/30' },
   IN_REVIEW: { label: 'In Review', icon: Clock, color: 'text-blue-400', bg: 'bg-blue-900/30' },
   APPROVED: { label: 'Approved', icon: CheckCircle2, color: 'text-green-400', bg: 'bg-green-900/30' },
   REJECTED: { label: 'Rejected', icon: XCircle, color: 'text-red-400', bg: 'bg-red-900/30' },
-  CANCELLED: { label: 'Cancelled', icon: XCircle, color: 'text-slate-500', bg: 'bg-slate-800' },
+  CANCELLED: { label: 'Cancelled', icon: XCircle, color: 'text-slate-500', bg: 'bg-slate-100' },
   EXPIRED: { label: 'Expired', icon: AlertCircle, color: 'text-orange-400', bg: 'bg-orange-900/30' },
 };
 
@@ -72,11 +72,11 @@ export default function MyProcessesList({ instances }: Props) {
   if (instances.length === 0) {
     return (
       <div className="text-center py-20">
-        <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
-          <AlertCircle className="w-8 h-8 text-slate-600" />
+        <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <AlertCircle className="w-8 h-8 text-slate-400" />
         </div>
-        <p className="text-slate-400 mb-4">{t('no_processes')}</p>
-        <a href="/processes" className="inline-flex items-center justify-center rounded-md border border-slate-700 bg-transparent px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 transition-colors">
+        <p className="text-slate-500 mb-4">{t('no_processes')}</p>
+        <a href="/processes" className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-transparent px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors">
           {t('start_process')}
         </a>
       </div>
@@ -92,7 +92,7 @@ export default function MyProcessesList({ instances }: Props) {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search your processes..."
-          className="pl-9 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-600 focus:border-blue-500"
+          className="pl-9 bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
         />
       </div>
 
@@ -108,15 +108,15 @@ export default function MyProcessesList({ instances }: Props) {
           return (
             <div
               key={instance.id}
-              className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 hover:border-slate-600 transition-all"
+              className="bg-white border border-slate-200 rounded-xl p-5 hover:border-slate-300 transition-all"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   {/* Title + badges */}
                   <div className="flex flex-wrap items-center gap-2 mb-2">
-                    <h3 className="font-medium text-white">{instance.processTemplate.name}</h3>
+                    <h3 className="font-medium text-slate-900">{instance.processTemplate.name}</h3>
                     {instance.processTemplate.category && (
-                      <Badge variant="secondary" className="text-xs bg-slate-700 text-slate-400 border-0">
+                      <Badge variant="secondary" className="text-xs bg-slate-100 text-slate-500 border-0">
                         {instance.processTemplate.category.name}
                       </Badge>
                     )}
@@ -137,15 +137,15 @@ export default function MyProcessesList({ instances }: Props) {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
                     {instance.submissionDate && (
                       <div>
-                        <p className="text-xs text-slate-600">{t('submitted_date')}</p>
-                        <p className="text-xs text-slate-400 font-medium">
+                        <p className="text-xs text-slate-500">{t('submitted_date')}</p>
+                        <p className="text-xs text-slate-600 font-medium">
                           {new Date(instance.submissionDate).toLocaleDateString()}
                         </p>
                       </div>
                     )}
                     {instance.completionDate && (
                       <div>
-                        <p className="text-xs text-slate-600">{t('completion_date')}</p>
+                        <p className="text-xs text-slate-500">{t('completion_date')}</p>
                         <p className="text-xs text-green-400 font-medium">
                           {new Date(instance.completionDate).toLocaleDateString()}
                         </p>
@@ -153,16 +153,16 @@ export default function MyProcessesList({ instances }: Props) {
                     )}
                     {instance.renewalDate && (
                       <div>
-                        <p className="text-xs text-slate-600">{t('renewal_date')}</p>
-                        <p className={`text-xs font-medium ${isNearRenewal ? 'text-purple-400' : 'text-slate-400'}`}>
+                        <p className="text-xs text-slate-500">{t('renewal_date')}</p>
+                        <p className={`text-xs font-medium ${isNearRenewal ? 'text-purple-600' : 'text-slate-600'}`}>
                           {new Date(instance.renewalDate).toLocaleDateString()}
                         </p>
                       </div>
                     )}
                     {instance.assignedDepartment && (
                       <div>
-                        <p className="text-xs text-slate-600">{t('assigned_to')}</p>
-                        <p className="text-xs text-slate-400 font-medium">
+                        <p className="text-xs text-slate-500">{t('assigned_to')}</p>
+                        <p className="text-xs text-slate-600 font-medium">
                           {instance.assignedStaffName || instance.assignedDepartment}
                         </p>
                       </div>
@@ -170,7 +170,7 @@ export default function MyProcessesList({ instances }: Props) {
                   </div>
 
                   {instance.lastSyncedAt && (
-                    <p className="text-xs text-slate-600 mt-2">
+                    <p className="text-xs text-slate-500 mt-2">
                       {t('last_synced', {
                         time: formatDistanceToNow(new Date(instance.lastSyncedAt), { addSuffix: true }),
                       })}
@@ -185,7 +185,7 @@ export default function MyProcessesList({ instances }: Props) {
                     size="sm"
                     onClick={() => handleRefresh(instance.id)}
                     disabled={refreshing === instance.id}
-                    className="text-slate-400 hover:text-white hover:bg-slate-700 h-8 px-2"
+                    className="text-slate-500 hover:text-slate-900 hover:bg-slate-100 h-8 px-2"
                     title={t('sync_now')}
                   >
                     <RefreshCw className={`w-3.5 h-3.5 ${refreshing === instance.id ? 'animate-spin' : ''}`} />

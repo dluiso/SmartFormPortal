@@ -104,7 +104,7 @@ export default function LicenseManager({ initial }: { initial: LicenseInfo | nul
 
       {/* License details */}
       {license && (
-        <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 space-y-1">
+        <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-1">
           <Row label={t('license_key')} value={
             <span className="font-mono text-xs">{license.licenseKey}</span>
           } />
@@ -146,7 +146,7 @@ export default function LicenseManager({ initial }: { initial: LicenseInfo | nul
         )}
         <button
           onClick={() => setShowActivate((v) => !v)}
-          className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm px-4 py-2 rounded-lg transition-colors"
+          className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm px-4 py-2 rounded-lg transition-colors"
         >
           <KeyRound size={14} />
           {license ? t('renew') : t('activate')}
@@ -155,16 +155,16 @@ export default function LicenseManager({ initial }: { initial: LicenseInfo | nul
 
       {/* Activation form */}
       {showActivate && (
-        <form onSubmit={handleActivate} className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 space-y-4">
-          <p className="text-sm text-slate-400">{t('not_configured')}</p>
+        <form onSubmit={handleActivate} className="bg-white border border-slate-200 rounded-xl p-5 space-y-4">
+          <p className="text-sm text-slate-500">{t('not_configured')}</p>
           <div>
-            <label className="block text-xs text-slate-400 mb-1">{t('enter_key')}</label>
+            <label className="block text-xs text-slate-600 mb-1">{t('enter_key')}</label>
             <input
               required
               value={key}
               onChange={(e) => setKey(e.target.value)}
               placeholder="XXXX-XXXX-XXXX-XXXX"
-              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           {activateError && <p className="text-red-400 text-xs">{activateError}</p>}
@@ -183,9 +183,9 @@ export default function LicenseManager({ initial }: { initial: LicenseInfo | nul
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="flex justify-between text-sm py-2 border-b border-slate-700/50 last:border-0">
-      <span className="text-slate-400">{label}</span>
-      <span className="text-slate-200 text-right">{value}</span>
+    <div className="flex justify-between text-sm py-2 border-b border-slate-200 last:border-0">
+      <span className="text-slate-500">{label}</span>
+      <span className="text-slate-900 text-right">{value}</span>
     </div>
   );
 }

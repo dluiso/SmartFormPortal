@@ -54,20 +54,20 @@ export default function BlockedCountriesManager({ initial }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 space-y-4">
-        <h3 className="text-sm font-semibold text-white">Block Country</h3>
+      <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4">
+        <h3 className="text-sm font-semibold text-slate-900">Block Country</h3>
         <p className="text-xs text-slate-500">Users from blocked countries cannot access the portal or register. Uses ISO 3166-1 alpha-2 codes.</p>
         <div className="grid grid-cols-3 gap-3">
           <div>
             <label className="block text-xs text-slate-500 mb-1">Code (2 letters)</label>
             <Input value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="RU"
               maxLength={2}
-              className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-600 focus:border-blue-500 font-mono uppercase" />
+              className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500 font-mono uppercase" />
           </div>
           <div className="col-span-2">
             <label className="block text-xs text-slate-500 mb-1">Country Name</label>
             <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Russia"
-              className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-600 focus:border-blue-500"
+              className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
               onKeyDown={(e) => e.key === 'Enter' && handleAdd()} />
           </div>
         </div>
@@ -77,21 +77,21 @@ export default function BlockedCountriesManager({ initial }: Props) {
         </Button>
       </div>
 
-      <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700/50">
-          <span className="text-sm font-semibold text-white">Blocked Countries</span>
-          <Badge className="bg-slate-700 text-slate-400 border-0">{countries.length}</Badge>
+      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200">
+          <span className="text-sm font-semibold text-slate-900">Blocked Countries</span>
+          <Badge className="bg-slate-100 text-slate-500 border-0">{countries.length}</Badge>
         </div>
         {countries.length === 0 ? (
           <p className="px-4 py-6 text-center text-slate-600 text-sm">No countries blocked</p>
         ) : (
-          <div className="divide-y divide-slate-700/30 max-h-72 overflow-y-auto">
+          <div className="divide-y divide-slate-200 max-h-72 overflow-y-auto">
             {countries.map((c) => (
               <div key={c.id} className="flex items-center justify-between px-4 py-2.5">
                 <div className="flex items-center gap-3">
                   <Globe className="w-3.5 h-3.5 text-slate-600 flex-shrink-0" />
                   <span className="text-xs font-mono text-red-400 bg-red-900/20 px-2 py-0.5 rounded">{c.countryCode}</span>
-                  <span className="text-sm text-slate-300">{c.countryName}</span>
+                  <span className="text-sm text-slate-600">{c.countryName}</span>
                 </div>
                 <button onClick={() => handleDelete(c.id, c.countryName)} className="text-slate-600 hover:text-red-400 transition-colors p-1">
                   <Trash2 className="w-3.5 h-3.5" />

@@ -53,14 +53,14 @@ export default async function FieldMappingsPage({ params }: Props) {
       <div className="mb-6">
         <a
           href="/admin/processes"
-          className="text-sm text-slate-500 hover:text-slate-300 transition-colors"
+          className="text-sm text-slate-500 hover:text-slate-700 transition-colors"
         >
           ← Back to Processes
         </a>
-        <h1 className="text-2xl font-bold text-white mt-2">
+        <h1 className="text-2xl font-bold text-slate-900 mt-2">
           Field Mappings
         </h1>
-        <p className="text-slate-400 text-sm mt-1">
+        <p className="text-slate-500 text-sm mt-1">
           {template.name} — Map Laserfiche MSSQL columns to portal fields
         </p>
       </div>

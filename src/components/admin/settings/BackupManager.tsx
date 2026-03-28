@@ -105,7 +105,7 @@ export default function BackupManager({ initial }: Props) {
     <div className="space-y-5 max-w-3xl">
       {/* Existing configs */}
       {configs.length === 0 && !showForm ? (
-        <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-10 text-center text-slate-500 text-sm">
+        <div className="bg-white border border-slate-200 rounded-xl p-10 text-center text-slate-500 text-sm">
           No backup configurations yet.
         </div>
       ) : (
@@ -116,14 +116,14 @@ export default function BackupManager({ initial }: Props) {
             const StatusIcon = statusCfg?.icon;
 
             return (
-              <div key={cfg.id} className="bg-slate-800/50 border border-slate-700/50 rounded-xl overflow-hidden">
+              <div key={cfg.id} className="bg-white border border-slate-200 rounded-xl overflow-hidden">
                 <div className="flex items-center justify-between px-4 py-3">
                   <div className="flex items-center gap-3">
                     <HardDrive className="w-4 h-4 text-slate-500 flex-shrink-0" />
                     <div>
-                      <p className="text-sm font-medium text-white">{cfg.name}</p>
+                      <p className="text-sm font-medium text-slate-900">{cfg.name}</p>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <Badge className="text-xs bg-slate-700 text-slate-400 border-0">{DEST_LABELS[cfg.destinationType]}</Badge>
+                        <Badge className="text-xs bg-slate-100 text-slate-500 border-0">{DEST_LABELS[cfg.destinationType]}</Badge>
                         {cfg.cronExpression && <span className="text-xs text-slate-600 font-mono">{cfg.cronExpression}</span>}
                         <span className="text-xs text-slate-600">Retain {cfg.retentionDays}d</span>
                       </div>
@@ -143,7 +143,7 @@ export default function BackupManager({ initial }: Props) {
                       {expanded === cfg.id ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                     </button>
                     <button onClick={() => handleToggle(cfg.id, cfg.isActive)}
-                      className={`w-8 h-4 rounded-full transition-colors relative ${cfg.isActive ? 'bg-green-600' : 'bg-slate-700'}`}>
+                      className={`w-8 h-4 rounded-full transition-colors relative ${cfg.isActive ? 'bg-green-600' : 'bg-slate-300'}`}>
                       <span className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-transform ${cfg.isActive ? 'translate-x-4' : 'translate-x-0.5'}`} />
                     </button>
                     <button onClick={() => handleDelete(cfg.id)} className="text-slate-600 hover:text-red-400 transition-colors p-1">
@@ -153,9 +153,9 @@ export default function BackupManager({ initial }: Props) {
                 </div>
 
                 {expanded === cfg.id && (
-                  <div className="border-t border-slate-700/50 px-4 py-3">
+                  <div className="border-t border-slate-200 px-4 py-3">
                     {lastRun ? (
-                      <div className="space-y-1 text-xs text-slate-400">
+                      <div className="space-y-1 text-xs text-slate-600">
                         <p>Last run: {formatDistanceToNow(new Date(lastRun.startedAt), { addSuffix: true })}</p>
                         {lastRun.completedAt && <p>Duration: {Math.round((new Date(lastRun.completedAt).getTime() - new Date(lastRun.startedAt).getTime()) / 1000)}s</p>}
                         {lastRun.errorMessage && <p className="text-red-400">Error: {lastRun.errorMessage}</p>}
@@ -173,19 +173,19 @@ export default function BackupManager({ initial }: Props) {
 
       {/* Create form */}
       {showForm && (
-        <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 space-y-4">
-          <h3 className="text-sm font-semibold text-white">New Backup Configuration</h3>
+        <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4">
+          <h3 className="text-sm font-semibold text-slate-900">New Backup Configuration</h3>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs text-slate-500 mb-1">Name</label>
               <Input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                 placeholder="Daily DB Backup"
-                className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-600 focus:border-blue-500" />
+                className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500" />
             </div>
             <div>
               <label className="block text-xs text-slate-500 mb-1">Destination</label>
               <select value={form.destinationType} onChange={(e) => setForm((f) => ({ ...f, destinationType: e.target.value as DestType }))}
-                className="w-full bg-slate-900 border border-slate-700 rounded-md px-2 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                className="w-full bg-white border border-slate-300 rounded-md px-2 py-2 text-sm text-slate-900 focus:outline-none focus:border-blue-500">
                 {Object.entries(DEST_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
               </select>
             </div>
@@ -193,12 +193,12 @@ export default function BackupManager({ initial }: Props) {
               <label className="block text-xs text-slate-500 mb-1">Cron Schedule</label>
               <Input value={form.cronExpression} onChange={(e) => setForm((f) => ({ ...f, cronExpression: e.target.value }))}
                 placeholder="0 2 * * *"
-                className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-600 focus:border-blue-500 font-mono" />
+                className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500 font-mono" />
             </div>
             <div>
               <label className="block text-xs text-slate-500 mb-1">Retention (days)</label>
               <Input type="number" value={form.retentionDays} onChange={(e) => setForm((f) => ({ ...f, retentionDays: parseInt(e.target.value) || 30 }))}
-                className="bg-slate-900 border-slate-700 text-white focus:border-blue-500" />
+                className="bg-white border-slate-300 text-slate-900 focus:border-blue-500" />
             </div>
           </div>
           <div className="flex gap-2">
@@ -206,14 +206,14 @@ export default function BackupManager({ initial }: Props) {
               {creating ? 'Creating...' : 'Create'}
             </Button>
             <Button variant="ghost" size="sm" onClick={() => setShowForm(false)}
-              className="text-slate-400 hover:text-white">Cancel</Button>
+              className="text-slate-500 hover:text-slate-900">Cancel</Button>
           </div>
         </div>
       )}
 
       {!showForm && (
         <Button variant="outline" size="sm" onClick={() => setShowForm(true)}
-          className="border-slate-700 text-slate-300 hover:bg-slate-800">
+          className="border-slate-300 text-slate-600 hover:bg-slate-100">
           <Plus className="w-3.5 h-3.5 mr-1.5" />
           Add Backup Config
         </Button>
