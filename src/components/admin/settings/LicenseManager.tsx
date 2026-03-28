@@ -109,11 +109,10 @@ export default function LicenseManager({ initial }: { initial: LicenseInfo | nul
           <Row label={t('license_key')} value={
             <span className="font-mono text-xs">{license.licenseKey}</span>
           } />
-          <Row label={t('license_type')} value={
-            t(`types.${license.licenseType.toLowerCase()}` as never) ?? license.licenseType
-          } />
-          {license.planName && (
+          {license.planName ? (
             <Row label={t('plan_name')} value={license.planName} />
+          ) : (
+            <Row label={t('plan_name')} value={license.licenseType} />
           )}
           <Row label={t('expires_at')} value={
             license.expiresAt ? new Date(license.expiresAt).toLocaleDateString() : '∞'

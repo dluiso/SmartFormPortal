@@ -531,7 +531,7 @@
       "license": {
         "title": "License",
         "license_key": "License Key",
-        "license_type": "License Type",
+        "plan_name": "Plan",
         "status": "Status",
         "active": "Active",
         "inactive": "Inactive",
