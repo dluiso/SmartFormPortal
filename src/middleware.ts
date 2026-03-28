@@ -145,8 +145,23 @@ export async function middleware(request: NextRequest) {
   }
 
   // ── Step 6: Setup guard — redirect to /setup if not installed
-  const isInstalled = request.cookies.get('sfp_installed')?.value === 'true';
-  if (!isInstalled && !pathname.startsWith('/setup') && !pathname.startsWith('/api/setup') && !pathname.startsWith('/api/health')) {
+  const isSetupPath = pathname.startsWith('/setup') || pathname.startsWith('/api/setup') || pathname.startsWith('/api/health');
+  let isInstalled = request.cookies.get('sfp_installed')?.value === 'true';
+
+  if (!isInstalled && !isSetupPath) {
+    // Cookie missing (e.g. different browser/PC) — verify against DB via setup API
+    try {
+      const res = await fetch(new URL('/api/setup', request.url), {
+        signal: AbortSignal.timeout(3000),
+      });
+      const data = await res.json() as { isInstalled: boolean };
+      isInstalled = data.isInstalled;
+    } catch {
+      isInstalled = false;
+    }
+  }
+
+  if (!isInstalled && !isSetupPath) {
     if (isApiRoute(pathname)) {
       return NextResponse.json(
         { error: 'Application not installed', code: 'NOT_INSTALLED' },
