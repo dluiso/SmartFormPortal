@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
       const response = NextResponse.json({ requires2FA: true });
       response.cookies.set('2fa_pending', pendingToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: process.env.COOKIE_SECURE !== 'false',
         sameSite: 'strict',
         maxAge: 5 * 60, // 5 minutes
         path: '/',

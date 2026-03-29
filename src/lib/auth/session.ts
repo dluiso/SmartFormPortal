@@ -23,10 +23,9 @@ export async function getSession(): Promise<JWTPayload | null> {
  * Cookie options for access token.
  */
 export function getAccessTokenCookieOptions() {
-  const isProd = process.env.NODE_ENV === 'production';
   return {
     httpOnly: true,
-    secure: isProd,
+    secure: process.env.COOKIE_SECURE !== 'false',
     sameSite: 'lax' as const,
     path: '/',
     maxAge: 60 * 60 * 8, // 8 hours
@@ -37,10 +36,9 @@ export function getAccessTokenCookieOptions() {
  * Cookie options for refresh token.
  */
 export function getRefreshTokenCookieOptions() {
-  const isProd = process.env.NODE_ENV === 'production';
   return {
     httpOnly: true,
-    secure: isProd,
+    secure: process.env.COOKIE_SECURE !== 'false',
     sameSite: 'lax' as const,
     path: '/',
     maxAge: 60 * 60 * 24 * 7, // 7 days
