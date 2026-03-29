@@ -1,10 +1,12 @@
 /**
  * RSA-SHA256 signature verification for license payloads.
- * Runs in Node.js runtime (API routes, validator).
- * Uses the built-in `crypto` module — no extra dependencies.
+ * Runs in Node.js runtime only (API routes, validator).
+ * Uses the built-in `crypto` module — not available in Edge Runtime.
  */
 
-import crypto from 'crypto';
+// This module must only be imported in Node.js runtime contexts.
+// Do NOT import this from middleware or Edge API routes.
+import crypto from 'node:crypto';
 
 /**
  * Verifies a license payload's RSA-SHA256 signature.

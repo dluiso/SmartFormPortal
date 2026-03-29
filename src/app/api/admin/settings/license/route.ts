@@ -5,6 +5,8 @@ import prisma from '@/lib/db/prisma';
 import { z } from 'zod';
 import { ACCESS_TOKEN_COOKIE } from '@/lib/auth/session';
 
+export const runtime = 'nodejs';
+
 function maskLicenseKey(key: string): string {
   if (key.length <= 12) return '****';
   return `${key.slice(0, 8)}…${key.slice(-4)}`;

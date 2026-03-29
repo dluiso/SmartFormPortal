@@ -5,6 +5,8 @@ import { validateTenantLicense } from '@/lib/license/validator';
 import { ACCESS_TOKEN_COOKIE } from '@/lib/auth/session';
 import { makeLicenseCookieValue, LICENSE_COOKIE_NAME } from '@/lib/license/cookieCache';
 
+export const runtime = 'nodejs';
+
 export async function POST(req: NextRequest) {
   const cookieStore = await cookies();
   const token = cookieStore.get(ACCESS_TOKEN_COOKIE)?.value ?? '';
