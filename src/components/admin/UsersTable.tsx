@@ -132,8 +132,8 @@ export default function UsersTable({ users: initialUsers, tenantId }: Props) {
                   <tr key={user.id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-blue-600/20 rounded-full flex items-center justify-center flex-shrink-0">
-                          <span className="text-xs font-bold text-blue-400">
+                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-xs font-bold text-blue-700">
                             {user.email.charAt(0).toUpperCase()}
                           </span>
                         </div>
@@ -158,8 +158,10 @@ export default function UsersTable({ users: initialUsers, tenantId }: Props) {
                       <Badge
                         className={
                           user.status === 'ACTIVE'
-                            ? 'bg-green-900/30 text-green-400 border-0'
-                            : 'bg-slate-100 text-slate-500 border-0'
+                            ? 'bg-green-100 text-green-700 border-0'
+                            : user.status === 'PENDING_VERIFICATION'
+                            ? 'bg-amber-100 text-amber-700 border-0'
+                            : 'bg-slate-100 text-slate-600 border-0'
                         }
                       >
                         {user.status === 'ACTIVE' ? 'Active' : user.status === 'PENDING_VERIFICATION' ? 'Pending' : 'Inactive'}

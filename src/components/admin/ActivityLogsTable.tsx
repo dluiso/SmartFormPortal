@@ -20,10 +20,10 @@ interface LogEntry {
 }
 
 const SEVERITY_CONFIG = {
-  INFO:     { icon: Info,          color: 'text-slate-500',  bg: 'bg-slate-100' },
-  WARNING:  { icon: AlertTriangle, color: 'text-amber-400',  bg: 'bg-amber-900/30' },
-  ERROR:    { icon: AlertCircle,   color: 'text-red-400',    bg: 'bg-red-900/30'   },
-  CRITICAL: { icon: Zap,           color: 'text-purple-400', bg: 'bg-purple-900/30'},
+  INFO:     { icon: Info,          color: 'text-slate-600',  bg: 'bg-slate-100'   },
+  WARNING:  { icon: AlertTriangle, color: 'text-amber-700',  bg: 'bg-amber-100'   },
+  ERROR:    { icon: AlertCircle,   color: 'text-red-700',    bg: 'bg-red-100'     },
+  CRITICAL: { icon: Zap,           color: 'text-purple-700', bg: 'bg-purple-100'  },
 };
 
 export default function ActivityLogsTable() {

@@ -335,8 +335,8 @@ export default function ProcessTemplatesManager({ templates: init, categories, d
               </>
             ) : (
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <FileText className="w-5 h-5 text-blue-400" />
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <FileText className="w-5 h-5 text-blue-700" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
@@ -345,10 +345,10 @@ export default function ProcessTemplatesManager({ templates: init, categories, d
                       <Badge className="text-xs bg-slate-100 text-slate-500 border-0">Inactive</Badge>
                     )}
                     {!tmpl.isPublic && (
-                      <Badge className="text-xs bg-orange-900/30 text-orange-400 border-0">Hidden</Badge>
+                      <Badge className="text-xs bg-orange-100 text-orange-700 border-0">Hidden</Badge>
                     )}
                     {tmpl.requiresRenewal && (
-                      <Badge className="text-xs bg-purple-900/30 text-purple-400 border-0">Renewal</Badge>
+                      <Badge className="text-xs bg-purple-100 text-purple-700 border-0">Renewal</Badge>
                     )}
                   </div>
                   <div className="flex items-center gap-3 mt-0.5">

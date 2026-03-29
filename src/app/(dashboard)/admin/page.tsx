@@ -34,12 +34,12 @@ export default async function AdminOverviewPage() {
   const totalInstances = instanceCounts.reduce((s, g) => s + g._count.status, 0);
 
   const cards = [
-    { label: t('total_users'), value: userCount, icon: Users, color: 'text-blue-400', bg: 'bg-blue-600/20' },
-    { label: t('active_users'), value: activeUserCount, icon: TrendingUp, color: 'text-green-400', bg: 'bg-green-600/20' },
-    { label: t('total_processes'), value: processTemplateCount, icon: FileText, color: 'text-purple-400', bg: 'bg-purple-600/20' },
-    { label: t('pending_processes'), value: pending, icon: Clock, color: 'text-yellow-400', bg: 'bg-yellow-600/20' },
-    { label: 'Total Applications', value: totalInstances, icon: AlertCircle, color: 'text-slate-400', bg: 'bg-slate-600/20' },
-    { label: 'Approved', value: approved, icon: CheckCircle2, color: 'text-green-400', bg: 'bg-green-600/20' },
+    { label: t('total_users'), value: userCount, icon: Users, color: 'text-blue-700', bg: 'bg-blue-100' },
+    { label: t('active_users'), value: activeUserCount, icon: TrendingUp, color: 'text-green-700', bg: 'bg-green-100' },
+    { label: t('total_processes'), value: processTemplateCount, icon: FileText, color: 'text-purple-700', bg: 'bg-purple-100' },
+    { label: t('pending_processes'), value: pending, icon: Clock, color: 'text-amber-700', bg: 'bg-amber-100' },
+    { label: 'Total Applications', value: totalInstances, icon: AlertCircle, color: 'text-slate-600', bg: 'bg-slate-100' },
+    { label: 'Approved', value: approved, icon: CheckCircle2, color: 'text-green-700', bg: 'bg-green-100' },
   ];
 
   return (

@@ -61,13 +61,13 @@ export default function DownloadsList({ instances }: Props) {
           className="flex items-center justify-between bg-white border border-slate-200 rounded-xl p-4 hover:border-slate-300 transition-all"
         >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-600/20 rounded-lg flex items-center justify-center flex-shrink-0">
-              <FileText className="w-5 h-5 text-green-400" />
+            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <FileText className="w-5 h-5 text-green-700" />
             </div>
             <div>
               <p className="font-medium text-slate-900 text-sm">{inst.processTemplate.name}</p>
               <div className="flex items-center gap-2 mt-0.5">
-                <Badge className="text-xs bg-green-900/30 text-green-400 border-0">Approved</Badge>
+                <Badge className="text-xs bg-green-100 text-green-700 border-0">Approved</Badge>
                 {inst.completionDate && (
                   <span className="text-xs text-slate-500">
                     {new Date(inst.completionDate).toLocaleDateString()}

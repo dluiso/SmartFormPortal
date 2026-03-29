@@ -120,13 +120,13 @@ export default function LanguageManager({ languages: initialLanguages }: Props) 
                     <span className="text-sm text-slate-900">{lang.name}</span>
                     <div className="flex items-center gap-2 mt-0.5">
                       {lang.isDefault && (
-                        <Badge className="text-xs bg-blue-900/30 text-blue-400 border-blue-700/30">Default</Badge>
+                        <Badge className="text-xs bg-blue-100 text-blue-700 border-0">Default</Badge>
                       )}
                       {lang.isBuiltIn && (
                         <Badge className="text-xs bg-slate-100 text-slate-500 border-0">Built-in</Badge>
                       )}
                       {lang.isComplete ? (
-                        <span className="flex items-center gap-1 text-xs text-green-400">
+                        <span className="flex items-center gap-1 text-xs text-green-700">
                           <CheckCircle2 className="w-3 h-3" /> Complete
                         </span>
                       ) : (
@@ -134,7 +134,7 @@ export default function LanguageManager({ languages: initialLanguages }: Props) 
                           onClick={() =>
                             setExpandedMissing(expandedMissing === lang.id ? null : lang.id)
                           }
-                          className="flex items-center gap-1 text-xs text-amber-400 hover:text-amber-300"
+                          className="flex items-center gap-1 text-xs text-amber-700 hover:text-amber-800"
                         >
                           <AlertCircle className="w-3 h-3" />
                           {lang.missingKeys.length} missing
@@ -165,7 +165,7 @@ export default function LanguageManager({ languages: initialLanguages }: Props) 
                 <div className="px-4 pb-3 ml-12">
                   <div className="bg-slate-50 rounded-lg p-3 max-h-40 overflow-y-auto">
                     {lang.missingKeys.map((key) => (
-                      <p key={key} className="text-xs font-mono text-amber-400/80">{key}</p>
+                      <p key={key} className="text-xs font-mono text-amber-700">{key}</p>
                     ))}
                   </div>
                 </div>

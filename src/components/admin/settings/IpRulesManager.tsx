@@ -68,8 +68,8 @@ export default function IpRulesManager({ initial }: Props) {
             <button key={t} onClick={() => setType(t)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
                 type === t ? (t === 'blacklist'
-                  ? 'border-red-700/50 bg-red-900/20 text-red-400'
-                  : 'border-green-700/50 bg-green-900/20 text-green-400')
+                  ? 'border-red-300 bg-red-100 text-red-700'
+                  : 'border-green-300 bg-green-100 text-green-700')
                 : 'border-slate-200 text-slate-500 hover:border-slate-300'
               }`}>
               {t === 'blacklist' ? <><ShieldOff className="w-3 h-3 inline mr-1" />Blacklist</> : <><ShieldCheck className="w-3 h-3 inline mr-1" />Whitelist</>}
@@ -93,8 +93,8 @@ export default function IpRulesManager({ initial }: Props) {
 
       {/* Lists */}
       {[
-        { label: 'Blacklisted IPs', items: blacklisted, color: 'text-red-400', bg: 'bg-red-900/20' },
-        { label: 'Whitelisted IPs', items: whitelisted, color: 'text-green-400', bg: 'bg-green-900/20' },
+        { label: 'Blacklisted IPs', items: blacklisted, color: 'text-red-700', bg: 'bg-red-100' },
+        { label: 'Whitelisted IPs', items: whitelisted, color: 'text-green-700', bg: 'bg-green-100' },
       ].map(({ label, items, color, bg }) => (
         <div key={label} className="bg-white border border-slate-200 rounded-xl overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200">

@@ -145,7 +145,7 @@ export default function ProfileForm({ user }: Props) {
             <p className="text-xs text-slate-500 mt-0.5">{t('user_id_help')}</p>
           </div>
           <div className="flex items-center gap-2">
-            <code className="text-xs text-blue-400 bg-blue-900/20 px-2 py-1 rounded font-mono">
+            <code className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded font-mono">
               {user.publicId.slice(0, 12)}...
             </code>
             <Button
@@ -154,7 +154,7 @@ export default function ProfileForm({ user }: Props) {
               onClick={copyId}
               className="w-7 h-7 text-slate-400 hover:text-slate-900"
             >
-              {copied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
+              {copied ? <Check className="w-3.5 h-3.5 text-green-700" /> : <Copy className="w-3.5 h-3.5" />}
             </Button>
           </div>
         </div>

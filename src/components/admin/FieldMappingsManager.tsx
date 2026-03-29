@@ -144,7 +144,7 @@ export default function FieldMappingsManager({
           status and data automatically.
         </p>
         {dbConnections.length === 0 && (
-          <p className="mt-2 text-amber-400">
+          <p className="mt-2 text-amber-700">
             No active DB connections found. Add one in{' '}
             <a href="/admin/db-connections" className="underline">
               DB Connections
@@ -190,7 +190,7 @@ export default function FieldMappingsManager({
                     ))}
                   </select>
                   {row.portalField === 'status' && (
-                    <Badge className="mt-1 text-xs bg-blue-900/30 text-blue-400 border-blue-700/30">
+                    <Badge className="mt-1 text-xs bg-blue-100 text-blue-700 border-0">
                       Auto-mapped to enum
                     </Badge>
                   )}

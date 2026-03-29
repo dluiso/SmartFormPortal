@@ -90,7 +90,7 @@ export default function BlockedCountriesManager({ initial }: Props) {
               <div key={c.id} className="flex items-center justify-between px-4 py-2.5">
                 <div className="flex items-center gap-3">
                   <Globe className="w-3.5 h-3.5 text-slate-600 flex-shrink-0" />
-                  <span className="text-xs font-mono text-red-400 bg-red-900/20 px-2 py-0.5 rounded">{c.countryCode}</span>
+                  <span className="text-xs font-mono text-red-700 bg-red-100 px-2 py-0.5 rounded">{c.countryCode}</span>
                   <span className="text-sm text-slate-600">{c.countryName}</span>
                 </div>
                 <button onClick={() => handleDelete(c.id, c.countryName)} className="text-slate-600 hover:text-red-400 transition-colors p-1">

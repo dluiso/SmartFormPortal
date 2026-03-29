@@ -36,13 +36,13 @@ interface Props {
 }
 
 const statusConfig: Record<ProcessStatus, { label: string; icon: React.ElementType; color: string; bg: string }> = {
-  DRAFT: { label: 'Draft', icon: AlertCircle, color: 'text-slate-500', bg: 'bg-slate-100' },
-  PENDING: { label: 'Pending', icon: Clock, color: 'text-amber-400', bg: 'bg-amber-900/30' },
-  IN_REVIEW: { label: 'In Review', icon: Clock, color: 'text-blue-400', bg: 'bg-blue-900/30' },
-  APPROVED: { label: 'Approved', icon: CheckCircle2, color: 'text-green-400', bg: 'bg-green-900/30' },
-  REJECTED: { label: 'Rejected', icon: XCircle, color: 'text-red-400', bg: 'bg-red-900/30' },
-  CANCELLED: { label: 'Cancelled', icon: XCircle, color: 'text-slate-500', bg: 'bg-slate-100' },
-  EXPIRED: { label: 'Expired', icon: AlertCircle, color: 'text-orange-400', bg: 'bg-orange-900/30' },
+  DRAFT:     { label: 'Draft',      icon: AlertCircle,  color: 'text-slate-600',  bg: 'bg-slate-100'  },
+  PENDING:   { label: 'Pending',    icon: Clock,        color: 'text-amber-700',  bg: 'bg-amber-100'  },
+  IN_REVIEW: { label: 'In Review',  icon: Clock,        color: 'text-blue-700',   bg: 'bg-blue-100'   },
+  APPROVED:  { label: 'Approved',   icon: CheckCircle2, color: 'text-green-700',  bg: 'bg-green-100'  },
+  REJECTED:  { label: 'Rejected',   icon: XCircle,      color: 'text-red-700',    bg: 'bg-red-100'    },
+  CANCELLED: { label: 'Cancelled',  icon: XCircle,      color: 'text-slate-600',  bg: 'bg-slate-100'  },
+  EXPIRED:   { label: 'Expired',    icon: AlertCircle,  color: 'text-orange-700', bg: 'bg-orange-100' },
 };
 
 export default function MyProcessesList({ instances }: Props) {
@@ -146,7 +146,7 @@ export default function MyProcessesList({ instances }: Props) {
                     {instance.completionDate && (
                       <div>
                         <p className="text-xs text-slate-500">{t('completion_date')}</p>
-                        <p className="text-xs text-green-400 font-medium">
+                        <p className="text-xs text-green-700 font-medium">
                           {new Date(instance.completionDate).toLocaleDateString()}
                         </p>
                       </div>
@@ -194,7 +194,7 @@ export default function MyProcessesList({ instances }: Props) {
                     <Button
                       size="sm"
                       variant="outline"
-                      className="h-8 px-3 text-xs border-purple-700/50 text-purple-400 hover:bg-purple-900/30"
+                      className="h-8 px-3 text-xs border-purple-300 text-purple-700 hover:bg-purple-100"
                       onClick={() => window.open(instance.renewalUrl!, '_blank', 'noopener,noreferrer')}
                     >
                       <RotateCcw className="w-3 h-3 mr-1" />
