@@ -3,7 +3,20 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { formatDistanceToNow } from 'date-fns';
-import { ExternalLink, RotateCcw, Clock, CheckCircle2, XCircle, AlertCircle, Search, RefreshCw } from 'lucide-react';
+import {
+  ExternalLink,
+  RotateCcw,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+  Search,
+  RefreshCw,
+  Building2,
+  User,
+  MapPin,
+  PauseCircle,
+} from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -35,15 +48,31 @@ interface Props {
   instances: ProcessInstance[];
 }
 
-const statusConfig: Record<ProcessStatus, { label: string; icon: React.ElementType; color: string; bg: string }> = {
-  DRAFT:     { label: 'Draft',      icon: AlertCircle,  color: 'text-slate-600',  bg: 'bg-slate-100'  },
-  PENDING:   { label: 'Pending',    icon: Clock,        color: 'text-amber-700',  bg: 'bg-amber-100'  },
-  IN_REVIEW: { label: 'In Review',  icon: Clock,        color: 'text-blue-700',   bg: 'bg-blue-100'   },
-  APPROVED:  { label: 'Approved',   icon: CheckCircle2, color: 'text-green-700',  bg: 'bg-green-100'  },
-  REJECTED:  { label: 'Rejected',   icon: XCircle,      color: 'text-red-700',    bg: 'bg-red-100'    },
-  CANCELLED: { label: 'Cancelled',  icon: XCircle,      color: 'text-slate-600',  bg: 'bg-slate-100'  },
-  EXPIRED:   { label: 'Expired',    icon: AlertCircle,  color: 'text-orange-700', bg: 'bg-orange-100' },
+// Status display config
+const statusConfig: Record<
+  ProcessStatus,
+  { label: string; icon: React.ElementType; color: string; bg: string; border: string }
+> = {
+  DRAFT:     { label: 'Draft',      icon: AlertCircle,  color: 'text-slate-600',  bg: 'bg-slate-100',  border: 'border-slate-200' },
+  PENDING:   { label: 'Pending',    icon: Clock,        color: 'text-amber-700',  bg: 'bg-amber-50',   border: 'border-amber-200' },
+  IN_REVIEW: { label: 'In Review',  icon: Clock,        color: 'text-blue-700',   bg: 'bg-blue-50',    border: 'border-blue-200'  },
+  APPROVED:  { label: 'Approved',   icon: CheckCircle2, color: 'text-green-700',  bg: 'bg-green-50',   border: 'border-green-200' },
+  REJECTED:  { label: 'Rejected',   icon: XCircle,      color: 'text-red-700',    bg: 'bg-red-50',     border: 'border-red-200'   },
+  CANCELLED: { label: 'Cancelled',  icon: XCircle,      color: 'text-slate-500',  bg: 'bg-slate-100',  border: 'border-slate-200' },
+  EXPIRED:   { label: 'Expired',    icon: AlertCircle,  color: 'text-orange-700', bg: 'bg-orange-50',  border: 'border-orange-200'},
 };
+
+// Detect "on hold" from the status label string
+function isOnHold(statusLabel: string | null): boolean {
+  if (!statusLabel) return false;
+  const s = statusLabel.toLowerCase();
+  return s.includes('hold') || s.includes('pause') || s.includes('paused') || s.includes('espera');
+}
+
+// Determine whether the process is still active (non-terminal)
+function isActive(status: ProcessStatus): boolean {
+  return status === ProcessStatus.PENDING || status === ProcessStatus.IN_REVIEW || status === ProcessStatus.DRAFT;
+}
 
 export default function MyProcessesList({ instances }: Props) {
   const t = useTranslations('my_processes');
@@ -60,7 +89,6 @@ export default function MyProcessesList({ instances }: Props) {
       const res = await fetch(`/api/my-processes/${instanceId}/sync`, { method: 'POST' });
       if (!res.ok) throw new Error();
       toast.success('Status refreshed successfully.');
-      // Reload page data
       window.location.reload();
     } catch {
       toast.error('Could not refresh status. Please try again later.');
@@ -76,7 +104,10 @@ export default function MyProcessesList({ instances }: Props) {
           <AlertCircle className="w-8 h-8 text-slate-400" />
         </div>
         <p className="text-slate-500 mb-4">{t('no_processes')}</p>
-        <a href="/processes" className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-transparent px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors">
+        <a
+          href="/processes"
+          className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-transparent px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors"
+        >
           {t('start_process')}
         </a>
       </div>
@@ -101,106 +132,143 @@ export default function MyProcessesList({ instances }: Props) {
         {filtered.map((instance) => {
           const config = statusConfig[instance.status];
           const StatusIcon = config.icon;
+          const onHold = isOnHold(instance.statusLabel);
+          const active = isActive(instance.status);
           const isNearRenewal =
             instance.renewalDate &&
             new Date(instance.renewalDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
+          // When on hold, override visual cues
+          const displayBg     = onHold ? 'bg-amber-50'   : config.bg;
+          const displayColor  = onHold ? 'text-amber-700' : config.color;
+          const displayBorder = onHold ? 'border-amber-200' : config.border;
+          const DisplayIcon   = onHold ? PauseCircle : StatusIcon;
+
           return (
             <div
               key={instance.id}
-              className="bg-white border border-slate-200 rounded-xl p-5 hover:border-slate-300 transition-all"
+              className={`bg-white border rounded-xl overflow-hidden hover:shadow-sm transition-all ${displayBorder}`}
             >
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1 min-w-0">
-                  {/* Title + badges */}
-                  <div className="flex flex-wrap items-center gap-2 mb-2">
-                    <h3 className="font-medium text-slate-900">{instance.processTemplate.name}</h3>
-                    {instance.processTemplate.category && (
-                      <Badge variant="secondary" className="text-xs bg-slate-100 text-slate-500 border-0">
-                        {instance.processTemplate.category.name}
-                      </Badge>
-                    )}
-                    {isNearRenewal && (
-                      <Badge className="text-xs bg-purple-900/40 text-purple-400 border-purple-700/50">
-                        Renewal soon
-                      </Badge>
-                    )}
-                  </div>
-
-                  {/* Status */}
-                  <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${config.bg}`}>
-                    <StatusIcon className={`w-3 h-3 ${config.color}`} />
-                    <span className={config.color}>{instance.statusLabel || config.label}</span>
-                  </div>
-
-                  {/* Details grid */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
-                    {instance.submissionDate && (
-                      <div>
-                        <p className="text-xs text-slate-500">{t('submitted_date')}</p>
-                        <p className="text-xs text-slate-600 font-medium">
-                          {new Date(instance.submissionDate).toLocaleDateString()}
-                        </p>
-                      </div>
-                    )}
-                    {instance.completionDate && (
-                      <div>
-                        <p className="text-xs text-slate-500">{t('completion_date')}</p>
-                        <p className="text-xs text-green-700 font-medium">
-                          {new Date(instance.completionDate).toLocaleDateString()}
-                        </p>
-                      </div>
-                    )}
-                    {instance.renewalDate && (
-                      <div>
-                        <p className="text-xs text-slate-500">{t('renewal_date')}</p>
-                        <p className={`text-xs font-medium ${isNearRenewal ? 'text-purple-600' : 'text-slate-600'}`}>
-                          {new Date(instance.renewalDate).toLocaleDateString()}
-                        </p>
-                      </div>
-                    )}
-                    {instance.assignedDepartment && (
-                      <div>
-                        <p className="text-xs text-slate-500">{t('assigned_to')}</p>
-                        <p className="text-xs text-slate-600 font-medium">
-                          {instance.assignedStaffName || instance.assignedDepartment}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-
-                  {instance.lastSyncedAt && (
-                    <p className="text-xs text-slate-500 mt-2">
-                      {t('last_synced', {
-                        time: formatDistanceToNow(new Date(instance.lastSyncedAt), { addSuffix: true }),
-                      })}
-                    </p>
-                  )}
+              {/* Active process: colored top bar showing current department */}
+              {active && instance.assignedDepartment && (
+                <div className="flex items-center gap-2 px-5 py-2 bg-blue-50 border-b border-blue-100">
+                  <MapPin className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
+                  <span className="text-xs text-blue-700 font-medium">
+                    {t('current_at')}:&nbsp;
+                    <span className="font-semibold">{instance.assignedDepartment}</span>
+                  </span>
                 </div>
+              )}
 
-                {/* Actions */}
-                <div className="flex flex-col gap-2 flex-shrink-0">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleRefresh(instance.id)}
-                    disabled={refreshing === instance.id}
-                    className="text-slate-500 hover:text-slate-900 hover:bg-slate-100 h-8 px-2"
-                    title={t('sync_now')}
-                  >
-                    <RefreshCw className={`w-3.5 h-3.5 ${refreshing === instance.id ? 'animate-spin' : ''}`} />
-                  </Button>
-                  {instance.renewalUrl && instance.status === ProcessStatus.APPROVED && (
+              <div className="p-5">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+
+                    {/* Title + badges */}
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <h3 className="font-semibold text-slate-900">{instance.processTemplate.name}</h3>
+                      {instance.processTemplate.category && (
+                        <Badge variant="secondary" className="text-xs bg-slate-100 text-slate-500 border-0">
+                          {instance.processTemplate.category.name}
+                        </Badge>
+                      )}
+                      {isNearRenewal && (
+                        <Badge className="text-xs bg-purple-100 text-purple-700 border-purple-200">
+                          Renewal soon
+                        </Badge>
+                      )}
+                    </div>
+
+                    {/* Status badge */}
+                    <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${displayBg} mb-3`}>
+                      <DisplayIcon className={`w-3.5 h-3.5 ${displayColor}`} />
+                      <span className={displayColor}>
+                        {instance.statusLabel || config.label}
+                      </span>
+                    </div>
+
+                    {/* Details grid */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-3 mt-1">
+                      {instance.submissionDate && (
+                        <div>
+                          <p className="text-xs text-slate-400 mb-0.5">{t('submitted_date')}</p>
+                          <p className="text-xs text-slate-700 font-medium">
+                            {new Date(instance.submissionDate).toLocaleDateString()}
+                          </p>
+                        </div>
+                      )}
+                      {instance.completionDate && (
+                        <div>
+                          <p className="text-xs text-slate-400 mb-0.5">{t('completion_date')}</p>
+                          <p className="text-xs text-green-700 font-medium">
+                            {new Date(instance.completionDate).toLocaleDateString()}
+                          </p>
+                        </div>
+                      )}
+                      {instance.renewalDate && (
+                        <div>
+                          <p className="text-xs text-slate-400 mb-0.5">{t('renewal_date')}</p>
+                          <p className={`text-xs font-medium ${isNearRenewal ? 'text-purple-700' : 'text-slate-700'}`}>
+                            {new Date(instance.renewalDate).toLocaleDateString()}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Department — shown when no top bar (non-active statuses) */}
+                      {!active && instance.assignedDepartment && (
+                        <div>
+                          <p className="text-xs text-slate-400 mb-0.5 flex items-center gap-1">
+                            <Building2 className="w-3 h-3" />{t('department')}
+                          </p>
+                          <p className="text-xs text-slate-700 font-medium">{instance.assignedDepartment}</p>
+                        </div>
+                      )}
+
+                      {/* Assigned staff — always shown when present */}
+                      {instance.assignedStaffName && (
+                        <div>
+                          <p className="text-xs text-slate-400 mb-0.5 flex items-center gap-1">
+                            <User className="w-3 h-3" />{t('assigned_staff')}
+                          </p>
+                          <p className="text-xs text-slate-700 font-medium">{instance.assignedStaffName}</p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Last synced */}
+                    {instance.lastSyncedAt && (
+                      <p className="text-xs text-slate-400 mt-3">
+                        {t('last_synced', {
+                          time: formatDistanceToNow(new Date(instance.lastSyncedAt), { addSuffix: true }),
+                        })}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex flex-col gap-2 flex-shrink-0">
                     <Button
+                      variant="ghost"
                       size="sm"
-                      variant="outline"
-                      className="h-8 px-3 text-xs border-purple-300 text-purple-700 hover:bg-purple-100"
-                      onClick={() => window.open(instance.renewalUrl!, '_blank', 'noopener,noreferrer')}
+                      onClick={() => handleRefresh(instance.id)}
+                      disabled={refreshing === instance.id}
+                      className="text-slate-400 hover:text-slate-700 hover:bg-slate-100 h-8 w-8 p-0"
+                      title={t('sync_now')}
                     >
-                      <RotateCcw className="w-3 h-3 mr-1" />
-                      Renew
+                      <RefreshCw className={`w-3.5 h-3.5 ${refreshing === instance.id ? 'animate-spin' : ''}`} />
                     </Button>
-                  )}
+                    {instance.renewalUrl && instance.status === ProcessStatus.APPROVED && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-8 px-3 text-xs border-purple-300 text-purple-700 hover:bg-purple-50"
+                        onClick={() => window.open(instance.renewalUrl!, '_blank', 'noopener,noreferrer')}
+                      >
+                        <RotateCcw className="w-3 h-3 mr-1" />
+                        Renew
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

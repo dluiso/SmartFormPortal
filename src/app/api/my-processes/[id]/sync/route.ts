@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import prisma from '@/lib/db/prisma';
-import { ProcessStatus } from '@prisma/client';
 
 export async function POST(
   _req: NextRequest,
@@ -61,12 +60,3 @@ export async function POST(
   }
 }
 
-// Map raw LF status strings to our enum
-export function mapLaserficheStatus(lfStatus: string): ProcessStatus {
-  const s = lfStatus.toLowerCase();
-  if (s.includes('approv') || s.includes('complet') || s.includes('done')) return ProcessStatus.APPROVED;
-  if (s.includes('reject') || s.includes('deni')) return ProcessStatus.REJECTED;
-  if (s.includes('review') || s.includes('pending') || s.includes('wait')) return ProcessStatus.IN_REVIEW;
-  if (s.includes('cancel')) return ProcessStatus.CANCELLED;
-  return ProcessStatus.IN_REVIEW;
-}
