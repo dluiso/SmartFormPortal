@@ -61,10 +61,8 @@ export async function syncInstance(instanceId: string, tenantId: string): Promis
     // Primary lookup: by portal_instance_id (precise — one ProcessInstance = one MSSQL row).
     // Fall back to portal_user_id for rows created before this column existed.
     record = await queryByPortalInstanceId(dbConnection, instanceId);
-    console.log(`[SyncEngine] instanceId=${instanceId} byPortalInstanceId=${record ? 'FOUND' : 'null'}`);
     if (!record) {
       record = await queryByPortalUserId(dbConnection, instance.user.publicId);
-      console.log(`[SyncEngine] fallback byPortalUserId=${instance.user.publicId} result=${record ? 'FOUND' : 'null'}`);
     }
   } catch (err: unknown) {
     const errorMsg = err instanceof Error ? err.message : String(err);
@@ -77,7 +75,6 @@ export async function syncInstance(instanceId: string, tenantId: string): Promis
   }
 
   if (!record) {
-    console.log(`[SyncEngine] No MSSQL record found for instanceId=${instanceId} — skipping`);
     // No record yet — process might not be submitted to LF yet, that's OK
     await prisma.processInstance.update({
       where: { id: instanceId },
@@ -88,12 +85,10 @@ export async function syncInstance(instanceId: string, tenantId: string): Promis
 
   // Apply field mappings
   const mappedData = applyFieldMappings(record, fieldMappings);
-  console.log(`[SyncEngine] instanceId=${instanceId} mappedStatus=${mappedData.status} fieldMappingsCount=${fieldMappings.length} rawStatus=${record['status'] ?? record['portal_status'] ?? '(none)'}`);
 
   const previousStatus = instance.status;
   const newStatus = mappedData.status ?? previousStatus;
   const statusChanged = newStatus !== previousStatus;
-  console.log(`[SyncEngine] instanceId=${instanceId} previousStatus=${previousStatus} newStatus=${newStatus} statusChanged=${statusChanged}`);
 
   // Update the ProcessInstance
   const { rawData, ...scalarData } = mappedData;
