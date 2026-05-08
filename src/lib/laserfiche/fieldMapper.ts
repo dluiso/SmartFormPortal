@@ -140,7 +140,10 @@ export function mapStatus(raw: string): ProcessStatus | null {
     s.includes('wait') ||
     s.includes('process') ||
     s.includes('progress') ||
-    s.includes('submit')
+    s.includes('submit') ||
+    s.includes('hold')    ||   // "on-hold", "on hold", "hold"
+    s.includes('active')  ||   // "active"
+    s.includes('open')         // "open"
   ) {
     return ProcessStatus.IN_REVIEW;
   }
