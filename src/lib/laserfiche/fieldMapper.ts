@@ -153,7 +153,12 @@ export function mapStatus(raw: string): ProcessStatus | null {
 
 function parseDate(value: unknown): Date | null {
   if (!value) return null;
-  if (value instanceof Date) return value;
+  if (value instanceof Date) {
+    // Reject SQL Server zero-date (1900-01-01) and anything before year 2000
+    return value.getFullYear() >= 2000 ? value : null;
+  }
   const d = new Date(String(value));
-  return isNaN(d.getTime()) ? null : d;
+  if (isNaN(d.getTime())) return null;
+  // Reject SQL Server zero-date (1900-01-01) and anything before year 2000
+  return d.getFullYear() >= 2000 ? d : null;
 }
