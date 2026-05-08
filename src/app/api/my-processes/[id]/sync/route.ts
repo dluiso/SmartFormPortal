@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import prisma from '@/lib/db/prisma';
+import { syncInstance } from '@/lib/laserfiche/syncEngine';
 
 export async function POST(
   _req: NextRequest,
@@ -30,7 +31,10 @@ export async function POST(
       return NextResponse.json({ synced: false, message: 'No sync source configured' });
     }
 
-    // Queue a sync job via BullMQ — use stable jobId to prevent duplicate queuing
+    // Run sync immediately (synchronous) so status is up-to-date before we respond
+    const syncResult = await syncInstance(id, tenantId);
+
+    // Also queue a BullMQ job for any follow-up background processing
     let queued = false;
     try {
       const { getSyncQueue } = await import('@/lib/queues/syncQueue');
@@ -42,10 +46,10 @@ export async function POST(
       );
       queued = true;
     } catch {
-      // BullMQ/Redis not available — sync job not enqueued
+      // BullMQ/Redis not available — that's OK, sync already ran synchronously above
     }
 
-    // Return the latest instance data
+    // Return the freshly-synced instance data
     const updated = await prisma.processInstance.findUnique({
       where: { id },
       include: {
@@ -53,7 +57,7 @@ export async function POST(
       },
     });
 
-    return NextResponse.json({ queued, instance: updated });
+    return NextResponse.json({ queued, synced: syncResult.synced, instance: updated });
   } catch (error) {
     console.error('[SYNC] Error:', error);
     return NextResponse.json({ error: 'Sync failed' }, { status: 500 });
