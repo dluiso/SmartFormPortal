@@ -43,46 +43,38 @@ export async function POST(
     return NextResponse.json({ error: 'User not found' }, { status: 404 });
   }
 
-  // Create the ProcessInstance (idempotent: reuse existing DRAFT/PENDING)
-  let instance = await prisma.processInstance.findFirst({
-    where: {
-      userId,
+  // Always create a new ProcessInstance — each submission is a unique process
+  const instance = await prisma.processInstance.create({
+    data: {
       tenantId,
+      userId,
       processTemplateId: templateId,
-      status: { in: [ProcessStatus.DRAFT, ProcessStatus.PENDING] },
+      status: ProcessStatus.PENDING,
     },
     select: { id: true },
   });
 
-  if (!instance) {
-    instance = await prisma.processInstance.create({
-      data: {
-        tenantId,
-        userId,
-        processTemplateId: templateId,
-        status: ProcessStatus.PENDING,
-      },
-      select: { id: true },
-    });
+  // Log the application start
+  await prisma.activityLog.create({
+    data: {
+      tenantId,
+      userId,
+      action: 'process_applied',
+      entityType: 'ProcessInstance',
+      entityId: instance.id,
+      details: { templateId, templateName: template.name },
+    },
+  });
 
-    // Log the application start
-    await prisma.activityLog.create({
-      data: {
-        tenantId,
-        userId,
-        action: 'process_applied',
-        entityType: 'ProcessInstance',
-        entityId: instance.id,
-        details: { templateId, templateName: template.name },
-      },
-    });
-  }
-
-  // Build the Laserfiche URL with portal_user_id query param
+  // Build the Laserfiche URL with both portal_user_id and portal_instance_id.
+  // portal_instance_id is the ProcessInstance UUID — LF stores it in MSSQL so
+  // the sync engine can match this exact instance regardless of how many times
+  // the same user applies for the same process template.
   let lfUrl: string;
   try {
     const url = new URL(template.publicUrl);
     url.searchParams.set('portal_user_id', user.publicId);
+    url.searchParams.set('portal_instance_id', instance.id);
     lfUrl = url.toString();
   } catch {
     // publicUrl may not be a full URL (relative or blank) — fall back as-is

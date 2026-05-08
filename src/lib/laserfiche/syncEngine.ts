@@ -5,7 +5,7 @@
  */
 
 import prisma from '@/lib/db/prisma';
-import { queryByPortalUserId } from './mssql';
+import { queryByPortalInstanceId, queryByPortalUserId } from './mssql';
 import { applyFieldMappings } from './fieldMapper';
 import { ProcessStatus, Prisma } from '@prisma/client';
 import { sendNotificationEmail } from '@/lib/email/notificationMailer';
@@ -58,7 +58,12 @@ export async function syncInstance(instanceId: string, tenantId: string): Promis
 
   let record;
   try {
-    record = await queryByPortalUserId(dbConnection, instance.user.publicId);
+    // Primary lookup: by portal_instance_id (precise — one ProcessInstance = one MSSQL row).
+    // Fall back to portal_user_id for rows created before this column existed.
+    record = await queryByPortalInstanceId(dbConnection, instanceId);
+    if (!record) {
+      record = await queryByPortalUserId(dbConnection, instance.user.publicId);
+    }
   } catch (err: unknown) {
     const errorMsg = err instanceof Error ? err.message : String(err);
     await prisma.processInstance.update({
