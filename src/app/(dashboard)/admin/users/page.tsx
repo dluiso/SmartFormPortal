@@ -11,7 +11,7 @@ export default async function AdminUsersPage() {
 
   const [users, departments] = await Promise.all([
     prisma.user.findMany({
-      where: { tenantId },
+      where: { tenantId, deletedAt: null },
       include: {
         roles: { include: { role: true } },
         departments: { include: { department: true } },

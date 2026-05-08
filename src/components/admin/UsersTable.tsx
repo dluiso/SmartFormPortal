@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Search, UserCheck, UserX, Trash2, Shield, Plus, X, Eye, EyeOff } from 'lucide-react';
+import { Search, UserCheck, UserX, Trash2, Shield, Plus, X, Eye, EyeOff, Pencil } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -44,6 +44,17 @@ const blankUserForm = {
   organization: '',
 };
 
+const blankEditForm = {
+  email: '',
+  firstName: '',
+  lastName: '',
+  phone: '',
+  organization: '',
+  systemRole: SystemRole.CLIENT as string,
+  departmentId: '' as string | null,
+  status: 'ACTIVE' as string,
+};
+
 const ROLE_OPTIONS = [
   { value: SystemRole.CLIENT,      label: 'Client (Resident/Applicant)' },
   { value: SystemRole.STAFF,       label: 'Staff' },
@@ -60,6 +71,9 @@ export default function UsersTable({ users: initialUsers, tenantId, currentUserR
   const [form, setForm] = useState(blankUserForm);
   const [showPassword, setShowPassword] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [editingUser, setEditingUser] = useState<UserRow | null>(null);
+  const [editForm, setEditForm] = useState(blankEditForm);
+  const [saving, setSaving] = useState(false);
 
   const isSuperAdmin = currentUserRole === SystemRole.SUPER_ADMIN;
   const isAdmin = isSuperAdmin || currentUserRole === SystemRole.ADMIN;
@@ -105,6 +119,53 @@ export default function UsersTable({ users: initialUsers, tenantId, currentUserR
       toast.error('Failed to delete user.');
     } finally {
       setLoading(null);
+    }
+  };
+
+  const openEdit = (user: UserRow) => {
+    // Find department id from the departments prop using the name stored in UserRow
+    const deptName = (user.departments as Array<{ department: { name: string } }>)[0]?.department?.name ?? null;
+    const deptId = deptName ? (departments.find(d => d.name === deptName)?.id ?? null) : null;
+    setEditForm({
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      phone: '',
+      organization: '',
+      systemRole: (user.roles[0]?.role.systemRole ?? SystemRole.CLIENT) as string,
+      departmentId: deptId,
+      status: user.status,
+    });
+    setEditingUser(user);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingUser) return;
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/admin/users/${editingUser.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName: editForm.firstName,
+          lastName: editForm.lastName,
+          email: editForm.email,
+          phone: editForm.phone || undefined,
+          organization: editForm.organization || undefined,
+          systemRole: editForm.systemRole,
+          departmentId: editForm.departmentId,
+          status: editForm.status,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to update');
+      setUsers(prev => prev.map(u => u.id === editingUser.id ? { ...u, ...data } : u));
+      setEditingUser(null);
+      toast.success('User updated successfully.');
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Failed to update user.');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -313,6 +374,97 @@ export default function UsersTable({ users: initialUsers, tenantId, currentUserR
         </div>
       )}
 
+      {/* Edit User Modal */}
+      {editingUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-6 border-b border-slate-200">
+              <h2 className="text-lg font-bold text-slate-900">Edit User</h2>
+              <button onClick={() => setEditingUser(null)} className="text-slate-400 hover:text-slate-600">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">First Name</label>
+                  <input type="text" value={editForm.firstName}
+                    onChange={e => setEditForm(f => ({ ...f, firstName: e.target.value }))}
+                    className="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Last Name</label>
+                  <input type="text" value={editForm.lastName}
+                    onChange={e => setEditForm(f => ({ ...f, lastName: e.target.value }))}
+                    className="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">Email</label>
+                <input type="email" value={editForm.email}
+                  onChange={e => setEditForm(f => ({ ...f, email: e.target.value }))}
+                  className="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Phone</label>
+                  <input type="text" value={editForm.phone}
+                    onChange={e => setEditForm(f => ({ ...f, phone: e.target.value }))}
+                    className="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+                    placeholder="Optional" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Organization</label>
+                  <input type="text" value={editForm.organization}
+                    onChange={e => setEditForm(f => ({ ...f, organization: e.target.value }))}
+                    className="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+                    placeholder="Optional" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Role</label>
+                  <select value={editForm.systemRole}
+                    onChange={e => setEditForm(f => ({ ...f, systemRole: e.target.value }))}
+                    className="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-blue-500">
+                    {ROLE_OPTIONS
+                      .filter(r => isSuperAdmin || r.value !== SystemRole.SUPER_ADMIN)
+                      .map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Status</label>
+                  <select value={editForm.status}
+                    onChange={e => setEditForm(f => ({ ...f, status: e.target.value }))}
+                    className="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-blue-500">
+                    <option value="ACTIVE">Active</option>
+                    <option value="INACTIVE">Inactive</option>
+                    <option value="PENDING_VERIFICATION">Pending Verification</option>
+                  </select>
+                </div>
+              </div>
+              {departments.length > 0 && (
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Department</label>
+                  <select value={editForm.departmentId ?? ''}
+                    onChange={e => setEditForm(f => ({ ...f, departmentId: e.target.value || null }))}
+                    className="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-blue-500">
+                    <option value="">No department</option>
+                    {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+                  </select>
+                </div>
+              )}
+            </div>
+            <div className="flex gap-3 p-6 border-t border-slate-200">
+              <Button onClick={handleSaveEdit} disabled={saving} className="flex-1">
+                {saving ? 'Saving…' : 'Save Changes'}
+              </Button>
+              <Button variant="outline" onClick={() => setEditingUser(null)}>Cancel</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -380,6 +532,14 @@ export default function UsersTable({ users: initialUsers, tenantId, currentUserR
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1">
+                        <Button
+                          size="sm" variant="ghost"
+                          onClick={() => openEdit(user)}
+                          className="h-7 w-7 p-0 text-slate-500 hover:text-blue-600 hover:bg-blue-50"
+                          title="Edit user"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </Button>
                         <Button
                           size="sm" variant="ghost"
                           disabled={loading === user.id}
