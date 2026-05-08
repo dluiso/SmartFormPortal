@@ -49,7 +49,7 @@ export async function POST(
       tenantId,
       userId,
       processTemplateId: templateId,
-      status: ProcessStatus.PENDING,
+      status: ProcessStatus.DRAFT,
     },
     select: { id: true },
   });

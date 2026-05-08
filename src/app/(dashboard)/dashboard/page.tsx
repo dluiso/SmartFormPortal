@@ -56,6 +56,9 @@ async function getDashboardData(userId: string, tenantId: string) {
   };
 
   for (const group of processStats) {
+    // DRAFT = form opened but not yet submitted — exclude from all stats
+    if (group.status === ProcessStatus.DRAFT) continue;
+
     const count = group._count.id;
     stats.total += count;
     if (
