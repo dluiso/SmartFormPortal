@@ -291,7 +291,8 @@
       "statistics": "Estadísticas",
       "logs": "Registros de Actividad",
       "settings": "Configuración",
-      "categories": "Categorías"
+      "categories": "Categorías",
+      "sync_jobs": "Sincronización"
     },
     "overview": {
       "title": "Resumen Admin",
@@ -316,7 +317,15 @@
       "user_type": "Tipo de Usuario",
       "no_users": "No se encontraron usuarios.",
       "confirm_delete": "¿Estás seguro de que deseas eliminar este usuario?",
-      "confirm_deactivate": "¿Estás seguro de que deseas desactivar este usuario?"
+      "confirm_deactivate": "¿Estás seguro de que deseas desactivar este usuario?",
+      "create_user": "Crear Usuario",
+      "first_name": "Nombre",
+      "last_name": "Apellido",
+      "password": "Contraseña",
+      "select_role": "Seleccionar Rol",
+      "select_department": "Seleccionar Departamento (opcional)",
+      "creating": "Creando...",
+      "user_created": "Usuario creado exitosamente"
     },
     "departments": {
       "title": "Departamentos",
@@ -565,6 +574,21 @@
           "health": "Salud"
         }
       }
+    },
+    "sync_jobs": {
+      "title": "Trabajos de Sincronización",
+      "new_job": "Nuevo Trabajo",
+      "no_jobs": "No hay trabajos de sincronización configurados",
+      "schedule": "Horario",
+      "last_run": "Última ejecución",
+      "records_synced": "registros sincronizados",
+      "never_run": "Nunca ejecutado",
+      "circuit_open": "Circuito Abierto",
+      "run_now": "Ejecutar Ahora",
+      "running": "Ejecutando...",
+      "active": "Activo",
+      "paused": "Pausado",
+      "reset_circuit": "Reiniciar Circuito"
     }
   },
   "setup": {
