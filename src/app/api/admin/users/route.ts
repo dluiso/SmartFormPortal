@@ -34,7 +34,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
-  const { email, firstName, lastName, password, systemRole, departmentId, phone, organization, userType } = parsed.data;
+  // Normalize email to lowercase (login route does the same lookup)
+  const email = parsed.data.email.toLowerCase().trim();
+  const { firstName, lastName, password, systemRole, departmentId, phone, organization, userType } = parsed.data;
 
   // Non-super-admins cannot create SUPER_ADMIN users
   if (systemRole === SystemRole.SUPER_ADMIN && adminRole !== SystemRole.SUPER_ADMIN) {
