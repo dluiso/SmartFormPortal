@@ -193,7 +193,7 @@ export default function MyProcessesList({ instances }: Props) {
                         <div>
                           <p className="text-xs text-slate-400 mb-0.5">{t('submitted_date')}</p>
                           <p className="text-xs text-slate-700 font-medium">
-                            {new Date(instance.submissionDate).toLocaleDateString()}
+                            {new Date(instance.submissionDate).toLocaleDateString(undefined, { timeZone: 'UTC' })}
                           </p>
                         </div>
                       )}
@@ -201,7 +201,7 @@ export default function MyProcessesList({ instances }: Props) {
                         <div>
                           <p className="text-xs text-slate-400 mb-0.5">{t('completion_date')}</p>
                           <p className="text-xs text-green-700 font-medium">
-                            {new Date(instance.completionDate).toLocaleDateString()}
+                            {new Date(instance.completionDate).toLocaleDateString(undefined, { timeZone: 'UTC' })}
                           </p>
                         </div>
                       )}
@@ -209,7 +209,7 @@ export default function MyProcessesList({ instances }: Props) {
                         <div>
                           <p className="text-xs text-slate-400 mb-0.5">{t('renewal_date')}</p>
                           <p className={`text-xs font-medium ${isNearRenewal ? 'text-purple-700' : 'text-slate-700'}`}>
-                            {new Date(instance.renewalDate).toLocaleDateString()}
+                            {new Date(instance.renewalDate).toLocaleDateString(undefined, { timeZone: 'UTC' })}
                           </p>
                         </div>
                       )}
