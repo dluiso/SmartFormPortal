@@ -36,6 +36,7 @@ export default async function DownloadsPage() {
     )
     .map((p) => ({
       id: p.id,
+      submissionDate: p.submissionDate,
       completionDate: p.completionDate,
       applicantName: p.applicantName,
       businessName: p.businessName,

@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 
 interface ProcessInstance {
   id: string;
+  submissionDate: Date | null;
   completionDate: Date | null;
   applicantName: string | null;
   businessName: string | null;
@@ -97,9 +98,21 @@ export default function DownloadsList({ instances }: Props) {
     );
   }
 
+  // Count how many times each process name appears — used to show index numbers
+  const nameCounts: Record<string, number> = {};
+  const nameIndex: Record<string, number> = {};
+  for (const inst of instances) {
+    nameCounts[inst.processTemplate.name] = (nameCounts[inst.processTemplate.name] ?? 0) + 1;
+  }
+
   return (
     <div className="space-y-3">
-      {instances.map((inst) => (
+      {instances.map((inst) => {
+        const hasDuplicates = nameCounts[inst.processTemplate.name] > 1;
+        nameIndex[inst.processTemplate.name] = (nameIndex[inst.processTemplate.name] ?? 0) + 1;
+        const index = nameIndex[inst.processTemplate.name];
+
+        return (
         <div
           key={inst.id}
           className="flex items-center justify-between bg-white border border-slate-200 rounded-xl p-4 hover:border-slate-300 transition-all"
@@ -110,16 +123,41 @@ export default function DownloadsList({ instances }: Props) {
               <FileText className="w-5 h-5 text-green-700" />
             </div>
             <div>
-              <p className="font-medium text-slate-900 text-sm">{inst.processTemplate.name}</p>
-              <div className="flex items-center gap-2 mt-0.5">
-                <Badge className="text-xs bg-green-100 text-green-700 border-0">Approved</Badge>
-                {inst.completionDate && (
-                  <span className="text-xs text-slate-500">
-                    {new Date(inst.completionDate).toLocaleDateString()}
+              {/* Title + index when there are duplicates */}
+              <div className="flex items-center gap-2">
+                <p className="font-medium text-slate-900 text-sm">{inst.processTemplate.name}</p>
+                {hasDuplicates && (
+                  <span className="text-xs font-semibold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">
+                    #{index}
                   </span>
                 )}
+              </div>
+
+              {/* Identifying details row */}
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
+                <Badge className="text-xs bg-green-100 text-green-700 border-0">Approved</Badge>
+
                 {inst.applicantName && (
-                  <span className="text-xs text-slate-400">{inst.applicantName}</span>
+                  <span className="text-xs text-slate-600 font-medium">{inst.applicantName}</span>
+                )}
+                {inst.businessName && inst.businessName !== inst.applicantName && (
+                  <span className="text-xs text-slate-500">{inst.businessName}</span>
+                )}
+
+                {inst.submissionDate && (
+                  <span className="text-xs text-slate-400">
+                    Submitted: {new Date(inst.submissionDate).toLocaleDateString(undefined, { timeZone: 'UTC' })}
+                  </span>
+                )}
+                {inst.completionDate && (
+                  <span className="text-xs text-slate-400">
+                    Approved: {new Date(inst.completionDate).toLocaleDateString(undefined, { timeZone: 'UTC' })}
+                  </span>
+                )}
+
+                {/* Fallback: short ID when no other identifying info */}
+                {!inst.applicantName && !inst.businessName && !inst.submissionDate && !inst.completionDate && (
+                  <span className="text-xs font-mono text-slate-400">{inst.id.slice(0, 8).toUpperCase()}</span>
                 )}
               </div>
             </div>
@@ -161,7 +199,8 @@ export default function DownloadsList({ instances }: Props) {
             )}
           </div>
         </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
