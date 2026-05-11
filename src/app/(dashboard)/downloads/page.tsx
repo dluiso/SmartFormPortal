@@ -11,7 +11,13 @@ export default async function DownloadsPage() {
   const t = await getTranslations('downloads');
 
   const completedProcesses = await prisma.processInstance.findMany({
-    where: { userId, tenantId, status: ProcessStatus.APPROVED },
+    where: {
+      userId,
+      tenantId,
+      status: ProcessStatus.APPROVED,
+      // Only processes that have a real LF document entry ID
+      lfDocumentEntryId: { not: null },
+    },
     include: {
       processTemplate: {
         include: { lfApiConnection: { select: { id: true } } },
@@ -20,17 +26,25 @@ export default async function DownloadsPage() {
     orderBy: { completionDate: 'desc' },
   });
 
-  const instances = completedProcesses.map((p) => ({
-    id: p.id,
-    completionDate: p.completionDate,
-    applicantName: p.applicantName,
-    businessName: p.businessName,
-    lfDocumentEntryId: p.lfDocumentEntryId,
-    processTemplate: {
-      name: p.processTemplate.name,
-      lfApiConnectionId: p.processTemplate.lfApiConnection?.id ?? null,
-    },
-  }));
+  // Further filter: remove placeholder "0" values and processes without an LF connection
+  const instances = completedProcesses
+    .filter(
+      (p) =>
+        p.lfDocumentEntryId &&
+        p.lfDocumentEntryId !== '0' &&
+        p.processTemplate.lfApiConnection?.id
+    )
+    .map((p) => ({
+      id: p.id,
+      completionDate: p.completionDate,
+      applicantName: p.applicantName,
+      businessName: p.businessName,
+      lfDocumentEntryId: p.lfDocumentEntryId!,
+      processTemplate: {
+        name: p.processTemplate.name,
+        lfApiConnectionId: p.processTemplate.lfApiConnection!.id,
+      },
+    }));
 
   return (
     <div className="space-y-6">
