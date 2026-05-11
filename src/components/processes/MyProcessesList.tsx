@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { formatDistanceToNow } from 'date-fns';
+import Link from 'next/link';
 import {
   ExternalLink,
   RotateCcw,
@@ -16,6 +17,7 @@ import {
   User,
   MapPin,
   PauseCircle,
+  ChevronRight,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -149,10 +151,10 @@ export default function MyProcessesList({ instances: initialInstances }: Props) 
     const displayBorder = onHold ? 'border-amber-200': config.border;
     const DisplayIcon   = onHold ? PauseCircle : StatusIcon;
 
-    return (
+    const card = (
       <div
         key={instance.id}
-        className={`bg-white border rounded-xl overflow-hidden hover:shadow-sm transition-all ${displayBorder}`}
+        className={`bg-white border rounded-xl overflow-hidden hover:shadow-sm transition-all ${displayBorder} ${instance.status !== ProcessStatus.DRAFT ? 'cursor-pointer hover:border-slate-300' : ''}`}
       >
         {/* Active process: colored top bar showing current department */}
         {active && instance.assignedDepartment && (
@@ -294,11 +296,23 @@ export default function MyProcessesList({ instances: initialInstances }: Props) 
                   Renew
                 </Button>
               )}
+              {instance.status !== ProcessStatus.DRAFT && (
+                <ChevronRight className="w-4 h-4 text-slate-300 mt-1" />
+              )}
             </div>
           </div>
         </div>
       </div>
     );
+
+    if (instance.status !== ProcessStatus.DRAFT) {
+      return (
+        <Link key={instance.id} href={`/my-processes/${instance.id}`} className="block">
+          {card}
+        </Link>
+      );
+    }
+    return card;
   };
 
   return (
