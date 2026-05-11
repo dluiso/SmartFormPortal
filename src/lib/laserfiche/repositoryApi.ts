@@ -88,11 +88,20 @@ export async function fetchLfDocument(conn: LfConnectionConfig, entryId: string)
   }
 
   // Fallback: export as PDF via Export API
+  // LF Repository API v1 self-hosted requires a 'file' property in the body
+  // (used internally when LF creates the export output entry in the repo)
   const exportUrl = `${base}/Entries/${encodeURIComponent(entryId)}/Export`;
+  const exportBody = {
+    part: 'Image',
+    imageOptions: { format: 'PDF', includeAnnotations: true },
+    // Required by LF v1 self-hosted — identifies the output file entry
+    file: { name: `export_${entryId}` },
+  };
+  console.log('[LF-EXPORT] POST', exportUrl, JSON.stringify(exportBody));
   const exportRes = await fetch(exportUrl, {
     method: 'POST',
     headers: { ...authHeader, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ part: 'Image', imageOptions: { format: 'PDF', includeAnnotations: true } }),
+    body: JSON.stringify(exportBody),
   });
 
   if (!exportRes.ok) {
