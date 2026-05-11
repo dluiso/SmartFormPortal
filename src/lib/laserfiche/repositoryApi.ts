@@ -74,8 +74,15 @@ export async function fetchLfDocument(conn: LfConnectionConfig, entryId: string)
   const edocRes = await fetch(edocUrl, { headers: authHeader });
   if (edocRes.ok) {
     const ct = (edocRes.headers.get('content-type') || '').toLowerCase();
-    // If LF returned 200 but with JSON it means an error body — fall through to export
-    if (!ct.includes('application/json')) return edocRes;
+    if (!ct.includes('application/json')) {
+      // Read the body to verify it's non-empty (entries without an electronic
+      // document return 200 with 0 bytes — fall through to Export in that case)
+      const buf = await edocRes.arrayBuffer();
+      if (buf.byteLength > 0) {
+        return new Response(buf, { status: 200, headers: edocRes.headers });
+      }
+      // Empty body — entry has no edoc, fall through to Export API
+    }
   }
 
   // Fallback: export as PDF via Export API
