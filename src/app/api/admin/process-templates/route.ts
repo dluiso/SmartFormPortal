@@ -16,6 +16,7 @@ const schema = z.object({
   categoryId: z.string().optional().nullable(),
   departmentId: z.string().optional().nullable(),
   dbConnectionId: z.string().optional().nullable(),
+  lfApiConnectionId: z.string().optional().nullable(),
 });
 
 export async function POST(request: NextRequest) {
@@ -46,6 +47,7 @@ export async function POST(request: NextRequest) {
         categoryId: data.categoryId ?? null,
         departmentId: data.departmentId ?? null,
         dbConnectionId: data.dbConnectionId ?? null,
+        lfApiConnectionId: data.lfApiConnectionId ?? null,
       },
     });
     return NextResponse.json({ template }, { status: 201 });

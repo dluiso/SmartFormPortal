@@ -8,15 +8,16 @@ export default async function AdminProcessesPage() {
   const tenantId = headersList.get('x-tenant-id') || '';
   const t = await getTranslations('admin.processes');
 
-  const [templates, categories, departments, dbConnections] = await Promise.all([
+  const [templates, categories, departments, dbConnections, lfApiConnections] = await Promise.all([
     prisma.processTemplate.findMany({
       where: { tenantId },
-      include: { category: true, department: true, dbConnection: true },
+      include: { category: true, department: true, dbConnection: true, lfApiConnection: true },
       orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
     }),
     prisma.category.findMany({ where: { tenantId }, orderBy: { name: 'asc' } }),
     prisma.department.findMany({ where: { tenantId, isActive: true }, orderBy: { name: 'asc' } }),
     prisma.dbConnection.findMany({ where: { tenantId }, orderBy: { name: 'asc' } }),
+    prisma.lfApiConnection.findMany({ where: { tenantId, isActive: true }, orderBy: { name: 'asc' } }),
   ]);
 
   return (
@@ -27,6 +28,7 @@ export default async function AdminProcessesPage() {
         categories={categories}
         departments={departments}
         dbConnections={dbConnections}
+        lfApiConnections={lfApiConnections}
       />
     </div>
   );

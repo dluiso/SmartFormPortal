@@ -16,6 +16,7 @@ const patchSchema = z.object({
   categoryId: z.string().optional().nullable(),
   departmentId: z.string().optional().nullable(),
   dbConnectionId: z.string().optional().nullable(),
+  lfApiConnectionId: z.string().optional().nullable(),
 });
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -42,6 +43,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     if (data.categoryId !== undefined) updateData.categoryId = data.categoryId;
     if (data.departmentId !== undefined) updateData.departmentId = data.departmentId;
     if (data.dbConnectionId !== undefined) updateData.dbConnectionId = data.dbConnectionId;
+    if (data.lfApiConnectionId !== undefined) updateData.lfApiConnectionId = data.lfApiConnectionId;
     if (data.availableFrom !== undefined) {
       updateData.availableFrom = data.availableFrom ? new Date(data.availableFrom) : null;
     }

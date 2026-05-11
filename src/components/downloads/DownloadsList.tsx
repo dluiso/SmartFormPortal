@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Download, Loader2, FileText } from 'lucide-react';
+import { Download, Loader2, FileText, FileDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
@@ -12,7 +12,8 @@ interface ProcessInstance {
   completionDate: Date | null;
   applicantName: string | null;
   businessName: string | null;
-  processTemplate: { name: string };
+  lfDocumentEntryId: string | null;
+  processTemplate: { name: string; lfApiConnectionId: string | null };
 }
 
 interface Props {
@@ -22,6 +23,36 @@ interface Props {
 export default function DownloadsList({ instances }: Props) {
   const t = useTranslations('downloads');
   const [downloading, setDownloading] = useState<string | null>(null);
+  const [requesting, setRequesting] = useState<string | null>(null);
+  const [activeTokens, setActiveTokens] = useState<Record<string, { token: string; expiresAt: Date; countdown: string }>>({});
+
+  const handleRequestDocument = async (instanceId: string) => {
+    setRequesting(instanceId);
+    try {
+      const res = await fetch(`/api/my-processes/${instanceId}/request-document`, { method: 'POST' });
+      if (!res.ok) {
+        const data = await res.json();
+        toast.error(data.error || 'Could not generate download link.');
+        return;
+      }
+      const { token, expiresAt } = await res.json();
+      const expiresDate = new Date(expiresAt);
+      setActiveTokens((prev) => ({ ...prev, [instanceId]: { token, expiresAt: expiresDate, countdown: '' } }));
+      toast.success('Download link ready — valid for 15 minutes.');
+      // Auto-remove expired token from UI
+      setTimeout(() => {
+        setActiveTokens((prev) => {
+          const next = { ...prev };
+          delete next[instanceId];
+          return next;
+        });
+      }, 15 * 60 * 1000);
+    } catch {
+      toast.error('Could not generate download link. Please try again.');
+    } finally {
+      setRequesting(null);
+    }
+  };
 
   const handleDownload = async (instanceId: string, processName: string) => {
     setDownloading(instanceId);
@@ -76,20 +107,49 @@ export default function DownloadsList({ instances }: Props) {
               </div>
             </div>
           </div>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => handleDownload(inst.id, inst.processTemplate.name)}
-            disabled={downloading === inst.id}
-            className="border-slate-300 text-slate-600 hover:bg-slate-100 h-8"
-          >
-            {downloading === inst.id ? (
-              <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
-            ) : (
-              <Download className="w-3.5 h-3.5 mr-1.5" />
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleDownload(inst.id, inst.processTemplate.name)}
+              disabled={downloading === inst.id}
+              className="border-slate-300 text-slate-600 hover:bg-slate-100 h-8"
+            >
+              {downloading === inst.id ? (
+                <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+              ) : (
+                <Download className="w-3.5 h-3.5 mr-1.5" />
+              )}
+              {t('download_pdf')}
+            </Button>
+            {inst.lfDocumentEntryId && inst.processTemplate.lfApiConnectionId && (
+              activeTokens[inst.id] ? (
+                <a
+                  href={`/api/downloads/document/${activeTokens[inst.id].token}`}
+                  download
+                  className="inline-flex items-center justify-center gap-1.5 h-8 px-3 text-sm font-medium rounded-md bg-green-600 text-white hover:bg-green-700 transition-colors"
+                >
+                  <FileDown className="w-3.5 h-3.5" />
+                  {t('download_lf_document')}
+                </a>
+              ) : (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleRequestDocument(inst.id)}
+                  disabled={requesting === inst.id}
+                  className="border-blue-300 text-blue-600 hover:bg-blue-50 h-8"
+                >
+                  {requesting === inst.id ? (
+                    <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                  ) : (
+                    <FileDown className="w-3.5 h-3.5 mr-1.5" />
+                  )}
+                  {t('request_lf_document')}
+                </Button>
+              )
             )}
-            {t('download_pdf')}
-          </Button>
+          </div>
         </div>
       ))}
     </div>

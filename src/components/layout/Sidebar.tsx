@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 import {
   LayoutDashboard, FileText, FolderOpen, Download, BarChart3,
   MessageSquare, Users, Building2, Database, Settings, Shield,
-  Tags, X, ChevronDown, BookOpen, ScrollText, RefreshCw,
+  Tags, X, ChevronDown, BookOpen, ScrollText, RefreshCw, Link2,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -202,8 +202,9 @@ export default function Sidebar({ session, open, onClose }: Props) {
     { label: tAdmin('departments'),     href: '/admin/departments',    icon: Building2 },
     { label: tAdmin('categories'),      href: '/admin/categories',     icon: Tags },
     { label: tAdmin('processes'),       href: '/admin/processes',      icon: FileText },
-    { label: tAdmin('db_connections'),  href: '/admin/db-connections', icon: Database },
-    { label: tAdmin('sync_jobs'),       href: '/admin/sync-jobs',      icon: RefreshCw },
+    { label: tAdmin('db_connections'),    href: '/admin/db-connections',    icon: Database },
+    { label: tAdmin('lf_api_connections'), href: '/admin/lf-api-connections', icon: Link2 },
+    { label: tAdmin('sync_jobs'),         href: '/admin/sync-jobs',         icon: RefreshCw },
     { label: tAdmin('statistics'),      href: '/admin/statistics',     icon: BarChart3 },
     { label: tAdmin('logs'),            href: '/admin/logs',           icon: ScrollText },
   ];

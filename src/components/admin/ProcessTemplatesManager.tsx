@@ -21,6 +21,7 @@ interface Template {
   category: { id: string; name: string } | null;
   department: { id: string; name: string } | null;
   dbConnection: { id: string; name: string } | null;
+  lfApiConnection: { id: string; name: string } | null;
 }
 
 interface Props {
@@ -28,6 +29,7 @@ interface Props {
   categories: { id: string; name: string }[];
   departments: { id: string; name: string }[];
   dbConnections: { id: string; name: string }[];
+  lfApiConnections: { id: string; name: string }[];
 }
 
 type FormState = {
@@ -43,6 +45,7 @@ type FormState = {
   categoryId: string;
   departmentId: string;
   dbConnectionId: string;
+  lfApiConnectionId: string;
 };
 
 const blank: FormState = {
@@ -58,6 +61,7 @@ const blank: FormState = {
   categoryId: '',
   departmentId: '',
   dbConnectionId: '',
+  lfApiConnectionId: '',
 };
 
 // ── Extracted to module level to prevent remount on every render ──────────────
@@ -99,10 +103,11 @@ interface EditFormProps {
   categories: { id: string; name: string }[];
   departments: { id: string; name: string }[];
   dbConnections: { id: string; name: string }[];
+  lfApiConnections: { id: string; name: string }[];
   tProc: ReturnType<typeof useTranslations>;
 }
 
-function EditForm({ form, setForm, cancel, handleSave, saving, categories, departments, dbConnections, tProc }: EditFormProps) {
+function EditForm({ form, setForm, cancel, handleSave, saving, categories, departments, dbConnections, lfApiConnections, tProc }: EditFormProps) {
   const checkboxFields: { key: keyof FormState; label: string }[] = [
     { key: 'isPublic', label: tProc('is_public') },
     { key: 'isActive', label: 'Active' },
@@ -149,6 +154,9 @@ function EditForm({ form, setForm, cancel, handleSave, saving, categories, depar
         <SelectField label={tProc('db_connection')} value={form.dbConnectionId}
           onChange={(v) => setForm({ ...form, dbConnectionId: v })}
           options={dbConnections} placeholder="None (manual only)" />
+        <SelectField label={tProc('lf_api_connection')} value={form.lfApiConnectionId}
+          onChange={(v) => setForm({ ...form, lfApiConnectionId: v })}
+          options={lfApiConnections} placeholder="None (no document download)" />
         <div>
           <label className="block text-xs font-medium text-slate-600 mb-1">Sort Order</label>
           <input
@@ -202,7 +210,7 @@ function EditForm({ form, setForm, cancel, handleSave, saving, categories, depar
   );
 }
 
-export default function ProcessTemplatesManager({ templates: init, categories, departments, dbConnections }: Props) {
+export default function ProcessTemplatesManager({ templates: init, categories, departments, dbConnections, lfApiConnections }: Props) {
   const t = useTranslations('admin.processes');
   const [items, setItems] = useState(init);
   const [editId, setEditId] = useState<string | 'new' | null>(null);
@@ -222,6 +230,7 @@ export default function ProcessTemplatesManager({ templates: init, categories, d
     categoryId: tmpl.category?.id ?? '',
     departmentId: tmpl.department?.id ?? '',
     dbConnectionId: tmpl.dbConnection?.id ?? '',
+    lfApiConnectionId: tmpl.lfApiConnection?.id ?? '',
   });
 
   const startCreate = () => { setEditId('new'); setForm(blank); };
@@ -239,6 +248,7 @@ export default function ProcessTemplatesManager({ templates: init, categories, d
         categoryId: form.categoryId || null,
         departmentId: form.departmentId || null,
         dbConnectionId: form.dbConnectionId || null,
+        lfApiConnectionId: form.lfApiConnectionId || null,
       };
       if (editId === 'new') {
         const res = await fetch('/api/admin/process-templates', {
@@ -255,6 +265,7 @@ export default function ProcessTemplatesManager({ templates: init, categories, d
             category: categories.find((c) => c.id === form.categoryId) ?? null,
             department: departments.find((d) => d.id === form.departmentId) ?? null,
             dbConnection: dbConnections.find((d) => d.id === form.dbConnectionId) ?? null,
+            lfApiConnection: lfApiConnections.find((c) => c.id === form.lfApiConnectionId) ?? null,
           },
         ]);
         toast.success('Process template created.');
@@ -276,6 +287,7 @@ export default function ProcessTemplatesManager({ templates: init, categories, d
                   category: categories.find((c) => c.id === form.categoryId) ?? null,
                   department: departments.find((d) => d.id === form.departmentId) ?? null,
                   dbConnection: dbConnections.find((d) => d.id === form.dbConnectionId) ?? null,
+                  lfApiConnection: lfApiConnections.find((c) => c.id === form.lfApiConnectionId) ?? null,
                 }
               : tmpl
           )
@@ -315,7 +327,7 @@ export default function ProcessTemplatesManager({ templates: init, categories, d
         <div className="bg-white border border-blue-500/50 rounded-xl p-5">
           <h3 className="text-sm font-semibold text-slate-900 mb-4">{t('add_process')}</h3>
           <EditForm form={form} setForm={setForm} cancel={cancel} handleSave={handleSave} saving={saving}
-            categories={categories} departments={departments} dbConnections={dbConnections} tProc={t} />
+            categories={categories} departments={departments} dbConnections={dbConnections} lfApiConnections={lfApiConnections} tProc={t} />
         </div>
       )}
 
@@ -331,7 +343,7 @@ export default function ProcessTemplatesManager({ templates: init, categories, d
               <>
                 <h3 className="text-sm font-semibold text-slate-900 mb-4">{t('edit_process')}</h3>
                 <EditForm form={form} setForm={setForm} cancel={cancel} handleSave={handleSave} saving={saving}
-                  categories={categories} departments={departments} dbConnections={dbConnections} tProc={t} />
+                  categories={categories} departments={departments} dbConnections={dbConnections} lfApiConnections={lfApiConnections} tProc={t} />
               </>
             ) : (
               <div className="flex items-center gap-3">

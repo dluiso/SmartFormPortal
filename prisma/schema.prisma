@@ -130,6 +130,7 @@ model Tenant {
   backupConfigs    BackupConfig[]
   licenseInfo      TenantLicense?
   syncJobs         SyncJob[]
+  lfApiConnections LfApiConnection[]
   ipRules          IpRule[]
   allowedZipCodes  AllowedZipCode[]
   blockedCountries BlockedCountry[]
@@ -302,6 +303,7 @@ model User {
   passwordResets     PasswordReset[]
   emailVerifications EmailVerification[]
   sessions           UserSession[]
+  documentDownloadTokens DocumentDownloadToken[]
 
   @@unique([tenantId, email])
   @@index([tenantId, status])
@@ -461,6 +463,8 @@ model ProcessTemplate {
   category       Category?     @relation(fields: [categoryId], references: [id])
   dbConnectionId String?
   dbConnection   DbConnection? @relation(fields: [dbConnectionId], references: [id])
+  lfApiConnectionId String?
+  lfApiConnection   LfApiConnection? @relation(fields: [lfApiConnectionId], references: [id])
 
   name            String
   description     String?  @db.Text
@@ -582,6 +586,56 @@ model SyncJob {
   updatedAt        DateTime     @updatedAt
 
   @@map("sync_jobs")
+}
+
+// ─────────────────────────────────────────────
+// LASERFICHE API CONNECTIONS
+// ─────────────────────────────────────────────
+
+model LfApiConnection {
+  id                String   @id @default(uuid())
+  tenantId          String
+  tenant            Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name              String
+  description       String?
+  baseUrl           String
+  repositoryId      String
+  apiVersion        String   @default("v1")
+  username          String
+  passwordEncrypted String   @db.Text
+  isActive          Boolean  @default(true)
+  lastTestedAt      DateTime?
+  lastTestSuccess   Boolean?
+  lastTestError     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  processTemplates       ProcessTemplate[]
+  documentDownloadTokens DocumentDownloadToken[]
+
+  @@unique([tenantId, name])
+  @@map("lf_api_connections")
+}
+
+// ─────────────────────────────────────────────
+// DOCUMENT DOWNLOAD TOKENS
+// ─────────────────────────────────────────────
+
+model DocumentDownloadToken {
+  id                String          @id @default(uuid())
+  tenantId          String
+  userId            String
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  instanceId        String
+  lfEntryId         String
+  lfApiConnectionId String
+  lfApiConnection   LfApiConnection @relation(fields: [lfApiConnectionId], references: [id], onDelete: Cascade)
+  expiresAt         DateTime
+  usedAt            DateTime?
+  createdAt         DateTime        @default(now())
+
+  @@index([tenantId, userId])
+  @@map("document_download_tokens")
 }
 
 // ─────────────────────────────────────────────
