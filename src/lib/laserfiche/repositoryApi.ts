@@ -69,6 +69,8 @@ export async function fetchLfDocument(conn: LfConnectionConfig, entryId: string)
   const base = `${conn.baseUrl.replace(/\/$/, '')}/${version}/Repositories/${encodeURIComponent(conn.repositoryId)}`;
   const authHeader = { Authorization: `Bearer ${token}` };
 
+  console.log('[LF-FETCH] entryId:', JSON.stringify(entryId), '| base:', base);
+
   // Try native edoc (original stored file)
   const edocUrl = `${base}/Entries/${encodeURIComponent(entryId)}/Laserfiche.Repository.Document/edoc`;
   const edocRes = await fetch(edocUrl, { headers: authHeader });
@@ -95,7 +97,7 @@ export async function fetchLfDocument(conn: LfConnectionConfig, entryId: string)
 
   if (!exportRes.ok) {
     const body = await exportRes.text().catch(() => '');
-    throw new Error(`LF export failed (${exportRes.status}): ${body.slice(0, 200)}`);
+    throw new Error(`LF export failed (${exportRes.status}): ${body.slice(0, 600)}`);
   }
 
   // Export v1 returns JSON with an operation token; poll until ready

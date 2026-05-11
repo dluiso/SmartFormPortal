@@ -34,6 +34,9 @@ export async function GET(
       return NextResponse.json({ error: 'This download link has expired. Please request a new one.' }, { status: 410 });
     }
 
+    // Debug: log exactly what entry ID we're using
+    console.log('[DOCUMENT-DOWNLOAD] lfEntryId value:', JSON.stringify(dlToken.lfEntryId), 'type:', typeof dlToken.lfEntryId);
+
     // Fetch document from LF FIRST so the token is not consumed on a failed download
     const lfResponse = await fetchLfDocument(dlToken.lfApiConnection, dlToken.lfEntryId);
 
