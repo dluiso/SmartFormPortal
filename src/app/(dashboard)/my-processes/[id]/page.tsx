@@ -45,6 +45,8 @@ export default async function ProcessDetailPage({ params }: Props) {
   const headersList = await headers();
   const userId   = headersList.get('x-user-id') || '';
   const tenantId = headersList.get('x-tenant-id') || '';
+  const userRole = headersList.get('x-user-role') || '';
+  const isAdmin  = userRole === 'SUPER_ADMIN' || userRole === 'ADMIN';
 
   const instance = await prisma.processInstance.findFirst({
     where: { id, userId, tenantId },
@@ -97,14 +99,16 @@ export default async function ProcessDetailPage({ params }: Props) {
         </div>
       </div>
 
-      {/* Reference ID */}
-      <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
-        <div className="flex items-center gap-2 text-slate-500 text-xs font-semibold uppercase tracking-wider mb-1">
-          <Hash className="w-3.5 h-3.5" />
-          Reference ID
+      {/* Reference ID — admin only */}
+      {isAdmin && (
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
+          <div className="flex items-center gap-2 text-slate-500 text-xs font-semibold uppercase tracking-wider mb-1">
+            <Hash className="w-3.5 h-3.5" />
+            Reference ID <span className="text-xs font-normal text-slate-400 normal-case tracking-normal">(admin only)</span>
+          </div>
+          <p className="font-mono text-sm text-slate-700 break-all select-all">{instance.id}</p>
         </div>
-        <p className="font-mono text-sm text-slate-700 break-all select-all">{instance.id}</p>
-      </div>
+      )}
 
       {/* Details grid */}
       <div className="bg-white border border-slate-200 rounded-xl p-6">
@@ -159,13 +163,13 @@ export default async function ProcessDetailPage({ params }: Props) {
               <p className="text-sm text-slate-800 font-medium">{instance.assignedStaffName}</p>
             </div>
           )}
-          {instance.lfProcessId && (
+          {isAdmin && instance.lfProcessId && (
             <div>
               <p className="text-xs text-slate-400 mb-0.5 flex items-center gap-1"><Hash className="w-3 h-3" />LF Process ID</p>
               <p className="text-sm font-mono text-slate-600">{instance.lfProcessId}</p>
             </div>
           )}
-          {instance.lfDocumentEntryId && (
+          {isAdmin && instance.lfDocumentEntryId && (
             <div>
               <p className="text-xs text-slate-400 mb-0.5 flex items-center gap-1"><FileText className="w-3 h-3" />LF Document Entry ID</p>
               <p className="text-sm font-mono text-slate-600">{instance.lfDocumentEntryId}</p>
@@ -191,8 +195,8 @@ export default async function ProcessDetailPage({ params }: Props) {
         )}
       </div>
 
-      {/* Raw data — collapsed by default */}
-      {rawData && Object.keys(rawData).length > 0 && (
+      {/* Raw data — admin only, collapsed by default */}
+      {isAdmin && rawData && Object.keys(rawData).length > 0 && (
         <details className="bg-white border border-slate-200 rounded-xl p-4">
           <summary className="text-sm font-semibold text-slate-600 cursor-pointer select-none">
             Form Data (raw)
