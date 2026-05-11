@@ -159,7 +159,7 @@ export default function DownloadsList({ instances }: Props) {
               )}
               {t('download_pdf')}
             </Button>
-            {inst.lfDocumentEntryId && inst.processTemplate.lfApiConnectionId && (
+            {inst.lfDocumentEntryId && inst.lfDocumentEntryId !== '0' && inst.processTemplate.lfApiConnectionId && (
               activeTokens[inst.id] ? (
                 <Button
                   size="sm"

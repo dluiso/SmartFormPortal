@@ -35,7 +35,7 @@ export async function POST(
     if (instance.status !== ProcessStatus.APPROVED && instance.status !== ProcessStatus.REJECTED) {
       return NextResponse.json({ error: 'Document only available for completed processes' }, { status: 400 });
     }
-    if (!instance.lfDocumentEntryId) {
+    if (!instance.lfDocumentEntryId || instance.lfDocumentEntryId === '0') {
       return NextResponse.json({ error: 'No document available for this process' }, { status: 404 });
     }
     if (!instance.processTemplate.lfApiConnection) {
