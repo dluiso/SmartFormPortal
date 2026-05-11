@@ -90,9 +90,13 @@ export function applyFieldMappings(
       case 'lfProcessId':
         result.lfProcessId = rawValue ? String(rawValue) : null;
         break;
-      case 'lfDocumentEntryId':
-        result.lfDocumentEntryId = rawValue ? String(rawValue) : null;
+      case 'lfDocumentEntryId': {
+        // Treat missing, null, 0, or "0" as null — a zero entry ID means
+        // the LF workflow hasn't filed the document yet.
+        const strVal = rawValue != null ? String(rawValue).trim() : '';
+        result.lfDocumentEntryId = strVal && strVal !== '0' ? strVal : null;
         break;
+      }
       case 'assignedDepartment':
         result.assignedDepartment = rawValue ? String(rawValue) : null;
         break;
