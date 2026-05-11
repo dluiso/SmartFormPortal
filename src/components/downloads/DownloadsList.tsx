@@ -23,6 +23,7 @@ interface Props {
 export default function DownloadsList({ instances }: Props) {
   const t = useTranslations('downloads');
   const [downloading, setDownloading] = useState<string | null>(null);
+  const [downloadingDoc, setDownloadingDoc] = useState<string | null>(null);
   const [requesting, setRequesting] = useState<string | null>(null);
   const [activeTokens, setActiveTokens] = useState<Record<string, { token: string; expiresAt: Date; countdown: string }>>({});
 
@@ -54,11 +55,46 @@ export default function DownloadsList({ instances }: Props) {
     }
   };
 
+  const handleDownloadDocument = async (instanceId: string, token: string, processName: string) => {
+    setDownloadingDoc(instanceId);
+    try {
+      const res = await fetch(`/api/downloads/document/${token}`);
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        toast.error(data.error || 'Could not download document. Please request a new link.');
+        // Remove the stale/failed token so the user can request a new one
+        setActiveTokens(prev => { const next = { ...prev }; delete next[instanceId]; return next; });
+        return;
+      }
+      const blob = await res.blob();
+      const contentDisp = res.headers.get('Content-Disposition') || '';
+      const filenameMatch = contentDisp.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+      const filename = filenameMatch?.[1]?.replace(/['"]/g, '') || `${processName.replace(/\s+/g, '_')}_document`;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+      // Remove used token from state
+      setActiveTokens(prev => { const next = { ...prev }; delete next[instanceId]; return next; });
+    } catch {
+      toast.error('Could not download document. Please try again.');
+    } finally {
+      setDownloadingDoc(null);
+    }
+  };
+
   const handleDownload = async (instanceId: string, processName: string) => {
     setDownloading(instanceId);
     try {
       const res = await fetch(`/api/downloads/${instanceId}/pdf`);
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        console.error('[PDF download]', data.detail || data.error);
+        toast.error(data.error || 'Could not generate PDF. Please try again.');
+        return;
+      }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -66,7 +102,8 @@ export default function DownloadsList({ instances }: Props) {
       a.download = `${processName.replace(/\s+/g, '_')}_${instanceId.slice(0, 8)}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
-    } catch {
+    } catch (err) {
+      console.error('[PDF download] unexpected error:', err);
       toast.error('Could not generate PDF. Please try again.');
     } finally {
       setDownloading(null);
@@ -124,14 +161,19 @@ export default function DownloadsList({ instances }: Props) {
             </Button>
             {inst.lfDocumentEntryId && inst.processTemplate.lfApiConnectionId && (
               activeTokens[inst.id] ? (
-                <a
-                  href={`/api/downloads/document/${activeTokens[inst.id].token}`}
-                  download
-                  className="inline-flex items-center justify-center gap-1.5 h-8 px-3 text-sm font-medium rounded-md bg-green-600 text-white hover:bg-green-700 transition-colors"
+                <Button
+                  size="sm"
+                  onClick={() => handleDownloadDocument(inst.id, activeTokens[inst.id].token, inst.processTemplate.name)}
+                  disabled={downloadingDoc === inst.id}
+                  className="h-8 px-3 text-xs bg-green-600 text-white hover:bg-green-700"
                 >
-                  <FileDown className="w-3.5 h-3.5" />
+                  {downloadingDoc === inst.id ? (
+                    <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                  ) : (
+                    <FileDown className="w-3.5 h-3.5 mr-1.5" />
+                  )}
                   {t('download_lf_document')}
-                </a>
+                </Button>
               ) : (
                 <Button
                   size="sm"

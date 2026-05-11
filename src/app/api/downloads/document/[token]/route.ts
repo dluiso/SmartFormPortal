@@ -34,20 +34,26 @@ export async function GET(
       return NextResponse.json({ error: 'This download link has expired. Please request a new one.' }, { status: 410 });
     }
 
-    // Mark as used BEFORE fetching to prevent race conditions
+    // Fetch document from LF FIRST so the token is not consumed on a failed download
+    const lfResponse = await fetchLfDocument(dlToken.lfApiConnection, dlToken.lfEntryId);
+
+    // Guard: if LF somehow returned JSON (error body with 200), surface it as an error
+    const contentType = lfResponse.headers.get('Content-Type') || 'application/octet-stream';
+    if (contentType.toLowerCase().includes('application/json')) {
+      const body = await lfResponse.text().catch(() => '');
+      throw new Error(`LF returned JSON instead of a document file: ${body.slice(0, 300)}`);
+    }
+
+    // Determine filename from LF Content-Disposition header
+    const contentDisposition = lfResponse.headers.get('Content-Disposition') || '';
+    const filename = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/)?.[1]?.replace(/['"]/g, '')
+      || `document_${dlToken.instanceId.slice(0, 8)}.pdf`;
+
+    // Mark token as used only after we know the document is valid
     await prisma.documentDownloadToken.update({
       where: { id: token },
       data: { usedAt: new Date() },
     });
-
-    // Fetch document from LF
-    const lfResponse = await fetchLfDocument(dlToken.lfApiConnection, dlToken.lfEntryId);
-
-    // Determine content type and filename from LF response
-    const contentType = lfResponse.headers.get('Content-Type') || 'application/octet-stream';
-    const contentDisposition = lfResponse.headers.get('Content-Disposition') || '';
-    const filename = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/)?.[1]?.replace(/['"]/g, '')
-      || `document_${dlToken.instanceId.slice(0, 8)}.pdf`;
 
     // Log the download activity
     await prisma.activityLog.create({

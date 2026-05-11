@@ -72,9 +72,13 @@ export async function fetchLfDocument(conn: LfConnectionConfig, entryId: string)
   // Try native edoc (original stored file)
   const edocUrl = `${base}/Entries/${encodeURIComponent(entryId)}/Laserfiche.Repository.Document/edoc`;
   const edocRes = await fetch(edocUrl, { headers: authHeader });
-  if (edocRes.ok) return edocRes;
+  if (edocRes.ok) {
+    const ct = (edocRes.headers.get('content-type') || '').toLowerCase();
+    // If LF returned 200 but with JSON it means an error body — fall through to export
+    if (!ct.includes('application/json')) return edocRes;
+  }
 
-  // Fallback: export as PDF
+  // Fallback: export as PDF via Export API
   const exportUrl = `${base}/Entries/${encodeURIComponent(entryId)}/Export`;
   const exportRes = await fetch(exportUrl, {
     method: 'POST',
@@ -87,12 +91,47 @@ export async function fetchLfDocument(conn: LfConnectionConfig, entryId: string)
     throw new Error(`LF export failed (${exportRes.status}): ${body.slice(0, 200)}`);
   }
 
-  const exportData = await exportRes.json() as { value?: string };
+  // Export v1 returns JSON with an operation token; poll until ready
+  const exportData = await exportRes.json() as { token?: string; value?: string };
+
+  // v2 style: direct URL in "value"
   if (exportData.value) {
     const dlRes = await fetch(exportData.value, { headers: authHeader });
     if (!dlRes.ok) throw new Error(`LF download link failed (${dlRes.status})`);
+    const dlCt = (dlRes.headers.get('content-type') || '').toLowerCase();
+    if (dlCt.includes('application/json')) {
+      const body = await dlRes.text().catch(() => '');
+      throw new Error(`LF returned JSON instead of document: ${body.slice(0, 300)}`);
+    }
     return dlRes;
   }
 
-  throw new Error('LF export did not return a usable download URL');
+  // v1 style: operation token — poll for completion
+  if (exportData.token) {
+    const operationUrl = `${base}/Tasks/${encodeURIComponent(exportData.token)}`;
+    let attempts = 0;
+    while (attempts < 15) {
+      await new Promise(r => setTimeout(r, 2000));
+      attempts++;
+      const taskRes = await fetch(operationUrl, { headers: authHeader });
+      if (!taskRes.ok) throw new Error(`LF export task poll failed (${taskRes.status})`);
+      const taskData = await taskRes.json() as { status?: string; resourceUrl?: string; percentComplete?: number };
+      if (taskData.status === 'Completed' && taskData.resourceUrl) {
+        const dlRes = await fetch(taskData.resourceUrl, { headers: authHeader });
+        if (!dlRes.ok) throw new Error(`LF download link failed (${dlRes.status})`);
+        const dlCt = (dlRes.headers.get('content-type') || '').toLowerCase();
+        if (dlCt.includes('application/json')) {
+          const body = await dlRes.text().catch(() => '');
+          throw new Error(`LF returned JSON instead of document: ${body.slice(0, 300)}`);
+        }
+        return dlRes;
+      }
+      if (taskData.status === 'Failed') {
+        throw new Error('LF export task failed on server side');
+      }
+    }
+    throw new Error('LF export task timed out after 30 seconds');
+  }
+
+  throw new Error('LF export did not return a usable download URL or operation token');
 }

@@ -35,8 +35,9 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error('[PDF] Error generating PDF:', error);
-    return NextResponse.json({ error: 'Could not generate PDF' }, { status: 500 });
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('[PDF] Error generating PDF:', message);
+    return NextResponse.json({ error: 'Could not generate PDF', detail: message }, { status: 500 });
   }
 }
 
@@ -134,22 +135,69 @@ async function generatePortalPdf(instance: {
 </html>`;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let chromium: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let puppeteer: any;
 
   try {
-    const chromiumMod = await import('@sparticuz/chromium');
-    chromium = chromiumMod.default ?? chromiumMod;
     puppeteer = await import('puppeteer-core');
   } catch {
-    throw new Error('Puppeteer or Chromium not available');
+    throw new Error('puppeteer-core not available');
+  }
+
+  // Build launch args — no-sandbox is required on most Linux servers
+  const baseArgs = [
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+    '--disable-dev-shm-usage',
+    '--disable-gpu',
+    '--no-zygote',
+    '--single-process',
+  ];
+
+  // Resolve executable path:
+  // 1. env override (set PUPPETEER_EXECUTABLE_PATH on the server if needed)
+  // 2. @sparticuz/chromium bundled binary
+  // 3. common system chromium paths
+  let executablePath: string | undefined = process.env.PUPPETEER_EXECUTABLE_PATH;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let chromiumArgs: string[] = baseArgs;
+
+  if (!executablePath) {
+    try {
+      const chromiumMod = await import('@sparticuz/chromium');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const chromium = (chromiumMod.default ?? chromiumMod) as any;
+      // v133+ requires these flags before reading executablePath
+      if (typeof chromium.setHeadlessMode !== 'undefined') chromium.setHeadlessMode = true;
+      if (typeof chromium.setGraphicsMode !== 'undefined') chromium.setGraphicsMode = false;
+      executablePath = await chromium.executablePath();
+      // Merge sparticuz args (they already include --no-sandbox etc.)
+      chromiumArgs = Array.isArray(chromium.args) ? chromium.args : baseArgs;
+    } catch {
+      // sparticuz not usable, fall through to system chromium
+    }
+  }
+
+  if (!executablePath) {
+    // Try well-known system paths
+    const { existsSync } = await import('fs');
+    const candidates = [
+      '/usr/bin/chromium-browser',
+      '/usr/bin/chromium',
+      '/usr/bin/google-chrome-stable',
+      '/usr/bin/google-chrome',
+    ];
+    executablePath = candidates.find(p => existsSync(p));
+  }
+
+  if (!executablePath) {
+    throw new Error(
+      'No Chromium binary found. Install chromium-browser on the server or set PUPPETEER_EXECUTABLE_PATH.'
+    );
   }
 
   const browser = await puppeteer.launch({
-    args: chromium.args,
-    defaultViewport: chromium.defaultViewport,
-    executablePath: await chromium.executablePath(),
+    args: chromiumArgs,
+    executablePath,
     headless: true,
   });
 
