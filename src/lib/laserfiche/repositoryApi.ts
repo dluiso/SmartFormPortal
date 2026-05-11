@@ -94,8 +94,8 @@ export async function fetchLfDocument(conn: LfConnectionConfig, entryId: string)
   const exportBody = {
     part: 'Image',
     imageOptions: { format: 'PDF', includeAnnotations: true },
-    // Required by LF v1 self-hosted — identifies the output file entry
-    file: { name: `export_${entryId}` },
+    // LF v1 self-hosted requires a 'file' property — try as string first
+    file: `export_${entryId}`,
   };
   console.log('[LF-EXPORT] POST', exportUrl, JSON.stringify(exportBody));
   const exportRes = await fetch(exportUrl, {
